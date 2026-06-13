@@ -1095,11 +1095,29 @@
                 document.getElementById('jobsContainer').innerHTML = '';
                 jobCount = 0;
 
-                // Set travel date
+                // Set travel date from Column C
                 const travelDate = data.getValue(0, 2);
                 if (travelDate) {
-                    const dateStr = travelDate instanceof Date ? travelDate.toISOString().split('T')[0] : travelDate;
+                    let dateStr = '';
+                    if (travelDate instanceof Date) {
+                        dateStr = travelDate.toISOString().split('T')[0];
+                    } else if (typeof travelDate === 'string') {
+                        // If it's already a string, try to parse and reformat
+                        const parts = travelDate.split('/');
+                        if (parts.length === 3) {
+                            // Handle DD/MM/YYYY or MM/DD/YYYY format
+                            const day = String(parts[0]).padStart(2, '0');
+                            const month = String(parts[1]).padStart(2, '0');
+                            const year = parts[2];
+                            dateStr = `${year}-${month}-${day}`;
+                        } else {
+                            dateStr = travelDate;
+                        }
+                    } else {
+                        dateStr = String(travelDate);
+                    }
                     document.getElementById('installationDate').value = dateStr;
+                    console.log('Travel date set to:', dateStr);
                 }
 
                 // Add jobs
