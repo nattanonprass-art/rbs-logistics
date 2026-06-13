@@ -1160,13 +1160,15 @@
                 showMsg('formMsg', `✅ พบ ${numRows} งาน!`, false);
 
                 for (let i = 0; i < numRows; i++) {
-                    const jobType = data.getValue(i, 2);
-                    const store = data.getValue(i, 4);
-                    const branch = data.getValue(i, 3);
+                    // SELECT * returns columns A-N
+                    // Column M (index 12) = Job type, Column L (index 11) = Branch, Column N (index 13) = Customer name
+                    const jobType = data.getValue(i, 12);    // Column M: ประเภทงาน
+                    const branch = data.getValue(i, 11);     // Column L: รหัสสาขา
+                    const customer = data.getValue(i, 13);   // Column N: ชื่อลูกค้า
 
                     const card = addJob();
                     if (card) {
-                        card.querySelector(`[name="job${jobCount}_customer"]`).value = store || '';
+                        card.querySelector(`[name="job${jobCount}_customer"]`).value = customer || '';
                         card.querySelector(`[name="job${jobCount}_type"]`).value = jobType || 'เลือกประเภทงาน';
                         card.querySelector(`[name="job${jobCount}_location"]`).value = branch || '';
                     }
@@ -1297,6 +1299,10 @@
                 installationDate: document.getElementById('installationDate').value,
                 jobs: jobs
             };
+
+            console.log('📤 Submitting data:', data);
+            console.log('📊 Jobs count:', jobs.length);
+            console.log('📋 Jobs data:', JSON.stringify(jobs, null, 2));
 
             const btn = e.target.querySelector('button[type="submit"]');
             btn.disabled = true;
