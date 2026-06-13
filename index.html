@@ -768,7 +768,7 @@
                         </div>
                     </div>
                     <div class="form-group" id="jobSelectContainer" style="display: none; margin-top: 12px;">
-                        <label>งาน #1 <span style="color: #667eea; font-weight: 600;">(เลือกงานอื่น)</span></label>
+                        <label>งาน #1 <span style="color: #667eea; font-weight: 600;">(เลือกงานอื่น ๆ)</span></label>
                         <select id="jobSelect" onchange="switchJob(this.value)" style="padding-right: 40px;">
                             <option value="">-- เลือกงาน --</option>
                         </select>
@@ -1301,12 +1301,22 @@
         function switchJob(idx) {
             if (idx === '') return;
 
-            const selectedJob = window.lookupedJobs[parseInt(idx)];
+            const jobIdx = parseInt(idx);
+            const selectedJob = window.lookupedJobs[jobIdx];
             const jobTypeValue = selectedJob.jobType ? String(selectedJob.jobType).trim() : '';
             const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
 
             const card = document.querySelector('.job-card');
             if (card) {
+                // Update job number in header - find span with "งาน #"
+                const headerDiv = card.querySelector('.job-header > div');
+                if (headerDiv) {
+                    const spans = headerDiv.querySelectorAll('span');
+                    if (spans.length > 1) {
+                        spans[1].textContent = `งาน #${jobIdx + 1}`;
+                    }
+                }
+
                 card.querySelector(`[name*="_customer"]`).value = selectedJob.customer || '';
                 card.querySelector(`[name*="_customerType"]`).value = selectedJob.customerType || '';
                 card.querySelector(`[name*="_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
@@ -1516,13 +1526,17 @@
                             const badge = document.createElement('span');
                             badge.className = 'success-badge';
                             badge.textContent = '✅ สำเร็จ';
-                            badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: auto;';
+                            badge.style.cssText = 'display: block; background: #10b981; color: white; padding: 6px 10px; border-radius: 20px; font-size: 12px; font-weight: 600; text-align: center; margin-top: 8px;';
                             header.appendChild(badge);
                         }
                     }
 
                     setTimeout(() => {
+                        // Reset form but keep truck number
+                        const truckNum = document.getElementById('truckNumber').value;
                         document.getElementById('evaluationForm').reset();
+                        document.getElementById('truckNumber').value = truckNum;
+
                         document.getElementById('jobsContainer').innerHTML = '';
                         document.getElementById('jobSelectContainer').style.display = 'none';
                         jobCount = 0;
