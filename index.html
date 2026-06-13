@@ -1,0 +1,2210 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบประเมินการติดตั้ง Shelf - RBS</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        body:has(#loginPage.active) {
+            padding: 0;
+            background: #f8fafc;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .container:has(#loginPage.active) {
+            max-width: 100%;
+            margin: 0;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .container:has(#loginPage.active) .header {
+            display: none;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px;
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        #loginPage.active {
+            padding: 0;
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1e3a8a;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 6px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        /* ============ LOGIN PAGE (centered, blue gradient) ============ */
+        #loginPage {
+            padding: 0 !important;
+            display: none;
+        }
+
+        #loginPage.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            /* 2-layer background: outer blue gradient + inner darker radial vignette */
+            background:
+                radial-gradient(ellipse 70% 60% at 50% 45%, rgba(2, 12, 40, 0.55) 0%, rgba(2, 12, 40, 0) 70%),
+                linear-gradient(160deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%);
+            padding: 24px 16px;
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 880px;
+            display: grid;
+            grid-template-columns: minmax(0, 380px) 1fr;
+            align-items: center;
+            gap: 36px;
+            /* Rectangular frame around the form */
+            background: rgba(255, 255, 255, 0.10);
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 24px;
+            padding: 38px 38px 34px;
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.35),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Left column = login form */
+        .login-form-col {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-width: 0;
+        }
+
+        /* Right column = shelf illustration */
+        .login-illustration {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 0;
+            padding: 10px;
+        }
+
+        .login-illustration svg {
+            width: 100%;
+            max-width: 420px;
+            height: auto;
+        }
+
+        /* Cart + upward arrow icon */
+        .login-logo {
+            width: 84px;
+            height: 84px;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 22px;
+            backdrop-filter: blur(4px);
+        }
+
+        .login-logo svg {
+            width: 46px;
+            height: 46px;
+        }
+
+        .login-brand {
+            color: #fff;
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .login-subtitle {
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 14px;
+            margin-bottom: 26px;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .login-container {
+            width: 100%;
+        }
+
+        .login-title {
+            display: none;
+        }
+
+        /* Input fields with leading icon */
+        .login-field {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .login-field .field-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 18px;
+            line-height: 1;
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
+        .login-field input {
+            width: 100%;
+            padding: 15px 16px 15px 46px !important;
+            border: 1px solid rgba(255, 255, 255, 0.4) !important;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            font-family: inherit;
+            font-size: 15px;
+            color: #1e293b;
+            transition: all 0.25s;
+        }
+
+        .login-field input::placeholder {
+            color: #94a3b8;
+        }
+
+        .login-field input:focus {
+            outline: none;
+            border-color: #fff !important;
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.25) !important;
+        }
+
+        /* White LOGIN button */
+        .login-submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: #fff;
+            color: #1d4ed8;
+            border: none;
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.25s;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+            margin-top: 6px;
+        }
+
+        .login-submit-btn:hover {
+            background: #f1f5f9;
+            transform: translateY(-1px);
+        }
+
+        .login-submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .forgot-link {
+            display: block;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            text-decoration: none;
+            margin-top: 18px;
+            cursor: pointer;
+        }
+
+        .forgot-link:hover {
+            color: #fff;
+            text-decoration: underline;
+        }
+
+        #loginPage .message {
+            margin-bottom: 14px;
+            border-radius: 10px;
+        }
+
+        /* Expandable Admin section */
+        .admin-section {
+            margin-top: 26px;
+            padding-top: 22px;
+            border-top: 1px solid rgba(255, 255, 255, 0.25);
+        }
+
+        .admin-toggle-btn {
+            width: 100%;
+            padding: 13px 16px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 600;
+            color: #fff;
+            font-size: 14px;
+        }
+
+        .admin-toggle-btn:hover,
+        .admin-toggle-btn.expanded {
+            background: rgba(255, 255, 255, 0.22);
+        }
+
+        .admin-toggle-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .admin-toggle-icon {
+            font-size: 16px;
+        }
+
+        .admin-toggle-arrow {
+            font-size: 12px;
+            transition: transform 0.3s;
+        }
+
+        .admin-toggle-btn.expanded .admin-toggle-arrow {
+            transform: rotate(180deg);
+        }
+
+        .admin-fields {
+            display: none;
+            margin-top: 14px;
+        }
+
+        .admin-fields.visible {
+            display: block;
+            animation: slideDown 0.3s ease-out;
+        }
+
+        .admin-fields .login-field {
+            margin-bottom: 12px;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-footer {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: center;
+            margin-top: 26px;
+            line-height: 1.5;
+        }
+
+        /* Tablet / small screens: hide illustration, single column form */
+        @media (max-width: 900px) {
+            .login-wrapper {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+                gap: 0;
+                padding: 38px 30px 30px;
+            }
+
+            .login-illustration {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            #loginPage.active {
+                padding: 18px 14px;
+            }
+
+            .login-wrapper {
+                max-width: 100%;
+                padding: 30px 20px 24px;
+                border-radius: 20px;
+            }
+
+            .login-logo {
+                width: 72px;
+                height: 72px;
+                border-radius: 20px;
+            }
+
+            .login-logo svg {
+                width: 40px;
+                height: 40px;
+            }
+
+            .login-brand {
+                font-size: 23px;
+            }
+        }
+
+        /* ============ ADMIN PAGE MODERN DESIGN ============ */
+        .admin-header {
+            background: linear-gradient(135deg, #0369A1 0%, #0EA5E9 100%);
+            color: white;
+            padding: 3rem 2rem;
+        }
+
+        .admin-header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .admin-actions {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        .admin-table thead {
+            background: #f9fafb;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .admin-table th {
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #374151;
+            white-space: nowrap;
+        }
+
+        .admin-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            color: #1f2937;
+        }
+
+        .admin-table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .admin-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        @media (max-width: 768px) {
+            .admin-header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .admin-card {
+                padding: 1.5rem;
+            }
+
+            .admin-table {
+                font-size: 12px;
+            }
+
+            .admin-table th,
+            .admin-table td {
+                padding: 12px 8px;
+            }
+        }
+
+        /* ============ BUTTON ============ */
+        .btn {
+            padding: 14px 20px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        /* ============ RATING ============ */
+        .rating-section {
+            background: #f9fafb;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .rating-group {
+            margin-bottom: 20px;
+        }
+
+        .rating-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .rating-label {
+            display: flex;
+            justify-content: space-between;
+            font-weight: 500;
+            color: #374151;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .rating-value {
+            background: #667eea;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .rating-input {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e5e7eb;
+            outline: none;
+            -webkit-appearance: none;
+            cursor: pointer;
+        }
+
+        .rating-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+        }
+
+        .rating-input::-moz-range-thumb {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: #667eea;
+            cursor: pointer;
+            border: none;
+        }
+
+        .rating-scale {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+
+        /* ============ JOB CARD ============ */
+        .job-card {
+            background: #f3f4f6;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .job-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #d1d5db;
+        }
+
+        .job-number {
+            font-weight: 700;
+            color: #667eea;
+            font-size: 16px;
+        }
+
+        /* ============ ADMIN TABLE ============ */
+        .table-responsive {
+            overflow-x: auto;
+            margin-bottom: 20px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .table th {
+            background: #1e3a8a;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .table td {
+            padding: 12px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table tbody tr:hover {
+            background: #f9fafb;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* ============ MESSAGE ============ */
+        .message {
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            color: #065f46;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            color: #7f1d1d;
+        }
+
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            padding: 8px 16px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .user-info {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            font-size: 13px;
+        }
+
+        /* ============ GRID ============ */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+
+        .nav-tab {
+            padding: 8px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #6b7280;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .nav-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .nav-tab:hover {
+            color: #1e3a8a;
+        }
+
+        .user-list {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: white;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        .user-item:last-child {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- HEADER -->
+        <div class="header">
+            <h1>🛠️ ระบบประเมินการติดตั้ง Shelf</h1>
+            <p>RBS Group - ประเมินคุณภาพงานและทีมงาน</p>
+        </div>
+
+        <!-- ============ LOGIN PAGE ============ -->
+        <div id="loginPage" class="content active">
+            <div class="login-wrapper">
+              <!-- LEFT: Login form -->
+              <div class="login-form-col">
+                <!-- Shelf icon -->
+                <div class="login-logo">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="1.6"
+                         stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Left support -->
+                        <line x1="5" y1="4" x2="5" y2="20"/>
+                        <!-- Right support -->
+                        <line x1="19" y1="4" x2="19" y2="20"/>
+                        <!-- Top shelf -->
+                        <line x1="5" y1="7" x2="19" y2="7"/>
+                        <!-- Middle shelf -->
+                        <line x1="5" y1="13" x2="19" y2="13"/>
+                        <!-- Bottom shelf -->
+                        <line x1="5" y1="19" x2="19" y2="19"/>
+                        <!-- Top left support -->
+                        <path d="M5 4 L2 7 L5 7" fill="none"/>
+                        <!-- Top right support -->
+                        <path d="M19 4 L22 7 L19 7" fill="none"/>
+                    </svg>
+                </div>
+
+                <h1 class="login-brand">RBS Logistics</h1>
+                <p class="login-subtitle">ระบบประเมินการติดตั้ง Shelf สำหรับทีมช่าง</p>
+
+                <div class="login-container">
+                    <h2 class="login-title">เข้าสู่ระบบ</h2>
+
+                    <div class="message success" id="loginMsg"></div>
+
+                    <div class="login-field">
+                        <span class="field-icon">📱</span>
+                        <input type="tel" id="loginPhone" placeholder="เบอร์โทรศัพท์ / Username">
+                    </div>
+
+                    <button class="login-submit-btn" onclick="handleLogin()">LOGIN</button>
+
+                    <a class="forgot-link" onclick="alert('กรุณาติดต่อผู้ดูแลระบบเพื่อขอความช่วยเหลือ')">ลืมรหัสผ่าน? / Forgot password?</a>
+
+                    <div class="admin-section">
+                        <button type="button" class="admin-toggle-btn" onclick="toggleAdminSection()">
+                            <div class="admin-toggle-content">
+                                <span class="admin-toggle-icon">🔐</span>
+                                <span>สำหรับ Admin</span>
+                            </div>
+                            <div class="admin-toggle-arrow">▼</div>
+                        </button>
+
+                        <div id="adminFields" class="admin-fields">
+                            <div class="login-field">
+                                <span class="field-icon">👤</span>
+                                <input type="text" id="adminId" placeholder="Admin ID">
+                            </div>
+                            <div class="login-field">
+                                <span class="field-icon">🔒</span>
+                                <input type="password" id="adminPassword" placeholder="Password">
+                            </div>
+                            <button class="login-submit-btn" onclick="handleAdminLogin()">เข้าสู่ระบบ Admin</button>
+                        </div>
+                    </div>
+
+                    <p class="login-footer">ลงทะเบียน / เข้าสู่ระบบ หมายความว่าคุณยอมรับ เงื่อนไขการใช้งาน</p>
+                </div>
+              </div>
+              <!-- /LEFT -->
+
+              <!-- RIGHT: Shelf Installation illustration -->
+              <div class="login-illustration" aria-hidden="true">
+                <svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Shelf installation illustration">
+                  <defs>
+                    <linearGradient id="shelfFrame" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#E0F2FE"/>
+                      <stop offset="1" stop-color="#BAE6FD"/>
+                    </linearGradient>
+                    <linearGradient id="shelfBoard" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#7DD3FC"/>
+                      <stop offset="1" stop-color="#0EA5E9"/>
+                    </linearGradient>
+                    <linearGradient id="boxA" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#38BDF8"/>
+                      <stop offset="1" stop-color="#0EA5E9"/>
+                    </linearGradient>
+                    <linearGradient id="boxB" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#0EA5E9"/>
+                      <stop offset="1" stop-color="#0369A1"/>
+                    </linearGradient>
+                    <linearGradient id="floorGrad" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0" stop-color="#0EA5E9" stop-opacity="0.18"/>
+                      <stop offset="1" stop-color="#0EA5E9" stop-opacity="0"/>
+                    </linearGradient>
+                  </defs>
+
+                  <!-- soft background circle -->
+                  <circle cx="210" cy="170" r="170" fill="#ffffff" opacity="0.10"/>
+                  <circle cx="210" cy="170" r="125" fill="#ffffff" opacity="0.10"/>
+
+                  <!-- floor shadow -->
+                  <ellipse cx="210" cy="332" rx="150" ry="16" fill="url(#floorGrad)"/>
+
+                  <!-- shelf vertical supports -->
+                  <rect x="78" y="46" width="14" height="280" rx="6" fill="url(#shelfFrame)"/>
+                  <rect x="328" y="46" width="14" height="280" rx="6" fill="url(#shelfFrame)"/>
+
+                  <!-- top rail / header -->
+                  <rect x="72" y="40" width="276" height="16" rx="7" fill="#0369A1"/>
+
+                  <!-- 3 shelves (boards) -->
+                  <rect x="78" y="118" width="264" height="14" rx="6" fill="url(#shelfBoard)"/>
+                  <rect x="78" y="200" width="264" height="14" rx="6" fill="url(#shelfBoard)"/>
+                  <rect x="78" y="282" width="264" height="14" rx="6" fill="url(#shelfBoard)"/>
+
+                  <!-- ===== Shelf 1 products (top) ===== -->
+                  <rect x="100" y="76" width="46" height="42" rx="5" fill="url(#boxA)"/>
+                  <rect x="100" y="86" width="46" height="6" fill="#0369A1" opacity="0.35"/>
+                  <rect x="156" y="84" width="34" height="34" rx="5" fill="url(#boxB)"/>
+                  <circle cx="225" cy="100" r="18" fill="#38BDF8"/>
+                  <circle cx="225" cy="100" r="9" fill="#E0F2FE" opacity="0.8"/>
+                  <rect x="258" y="72" width="30" height="46" rx="5" fill="url(#boxB)"/>
+                  <rect x="296" y="88" width="34" height="30" rx="5" fill="url(#boxA)"/>
+
+                  <!-- ===== Shelf 2 products (middle) ===== -->
+                  <rect x="100" y="160" width="38" height="40" rx="5" fill="url(#boxB)"/>
+                  <rect x="146" y="166" width="44" height="34" rx="5" fill="url(#boxA)"/>
+                  <rect x="146" y="176" width="44" height="6" fill="#0369A1" opacity="0.3"/>
+                  <rect x="200" y="156" width="32" height="44" rx="5" fill="url(#boxA)"/>
+                  <circle cx="262" cy="182" r="18" fill="url(#boxB)"/>
+                  <rect x="292" y="162" width="38" height="38" rx="5" fill="url(#boxB)"/>
+
+                  <!-- ===== Shelf 3 products (bottom) ===== -->
+                  <rect x="100" y="240" width="42" height="42" rx="5" fill="url(#boxA)"/>
+                  <rect x="150" y="248" width="34" height="34" rx="5" fill="url(#boxB)"/>
+                  <rect x="194" y="236" width="46" height="46" rx="5" fill="url(#boxB)"/>
+                  <rect x="194" y="248" width="46" height="7" fill="#E0F2FE" opacity="0.4"/>
+                  <rect x="250" y="252" width="32" height="30" rx="5" fill="url(#boxA)"/>
+                  <circle cx="308" cy="262" r="20" fill="url(#boxA)"/>
+                  <circle cx="308" cy="262" r="10" fill="#E0F2FE" opacity="0.8"/>
+
+                  <!-- installer's checkmark badge -->
+                  <circle cx="338" cy="118" r="22" fill="#ffffff"/>
+                  <path d="M328 118 l7 7 l14 -15" fill="none" stroke="#0369A1" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+              <!-- /RIGHT -->
+            </div>
+        </div>
+
+        <!-- ============ EVALUATION FORM PAGE ============ -->
+        <div id="formPage" class="content">
+            <div class="user-info" id="userInfo" style="position: static; color: #1e3a8a; margin-bottom: 20px;"></div>
+            <button class="logout-btn" onclick="handleLogout()" style="position: static; display: inline-block; margin-bottom: 20px;">ออกจากระบบ</button>
+
+            <div class="message success" id="successMsg"></div>
+
+            <form id="evaluationForm">
+                <!-- ข้อมูลทั่วไป -->
+                <div class="rating-section">
+                    <h3 style="color: #1e3a8a; margin-bottom: 15px;">📋 ข้อมูลทั่วไป</h3>
+
+                    <div class="grid-2">
+                        <div class="form-group">
+                            <label>หมายเลขใบรถ *</label>
+                            <div style="display: flex; gap: 8px;">
+                                <input type="text" id="truckNumber" placeholder="เช่น T2606041" required style="flex: 1;">
+                                <button type="button" class="btn btn-small btn-primary" onclick="lookupTruck()" style="width: auto; padding: 8px 16px;">🔍 ค้นหา</button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>วันที่ติดตั้ง *</label>
+                            <input type="date" id="installationDate" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- รายการงาน -->
+                <div class="rating-section">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; color: #1e3a8a;">🛠️ รายการงาน</h3>
+                        <button type="button" class="btn btn-small btn-primary" onclick="addJob()" style="width: auto; padding: 8px 16px;">➕ เพิ่มงาน</button>
+                    </div>
+
+                    <div id="jobsContainer">
+                        <!-- Job items will be added here -->
+                    </div>
+                </div>
+
+                <!-- ปุ่มส่ง -->
+                <div class="btn-group">
+                    <button type="submit" class="btn btn-primary">📤 ส่งแบบฟอร์ม</button>
+                    <button type="reset" class="btn btn-secondary">🔄 ล้างข้อมูล</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- ============ ADMIN PAGE ============ -->
+        <div id="adminPage" class="content" style="padding: 0;">
+            <!-- Admin Header -->
+            <div class="admin-header">
+                <div class="admin-header-content">
+                    <div>
+                        <h1 style="margin: 0 0 8px; font-size: 28px; font-weight: 700; color: white;">🔐 Admin Dashboard</h1>
+                        <p style="margin: 0; font-size: 15px; opacity: 0.9;">จัดการข้อมูลประเมินและผู้ใช้ระบบ</p>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()" style="background: #ef4444; border: none; color: white;">ออกจากระบบ</button>
+                </div>
+            </div>
+
+            <!-- Admin Content -->
+            <div style="padding: 40px;">
+                <div class="nav-tabs" style="margin-bottom: 30px;">
+                    <button class="nav-tab active" onclick="switchAdminTab('submissions', this)">📊 ข้อมูลที่ส่ง</button>
+                    <button class="nav-tab" onclick="switchAdminTab('users', this)">👥 จัดการผู้ใช้</button>
+                </div>
+
+                <!-- Submissions Tab -->
+                <div id="submissionsTab">
+                    <div class="message" id="adminMsg"></div>
+                    <div class="admin-actions">
+                        <button class="btn btn-secondary btn-small" onclick="refreshData()" style="width: auto; margin-right: 10px;">🔄 รีเฟรชข้อมูล</button>
+                        <button class="btn btn-secondary btn-small" onclick="exportCSV()" style="width: auto; margin-right: 10px;">📥 ส่งออก CSV</button>
+                        <button class="btn btn-secondary btn-small" onclick="window.open(GOOGLE_SHEET_URL, '_blank')" style="width: auto;">📊 ดู Google Sheet</button>
+                    </div>
+
+                    <div class="admin-card">
+                        <h3 style="color: #1e3a8a; margin: 0 0 20px; font-size: 18px; font-weight: 600;">ประวัติการส่งประเมิน</h3>
+                        <div class="table-responsive">
+                            <table class="admin-table">
+                                <thead>
+                                    <tr>
+                                        <th>วันที่ส่ง</th>
+                                        <th>เบอร์โทร</th>
+                                        <th>ใบรถ</th>
+                                        <th>งาน</th>
+                                        <th>คะแนนเฉลี่ย</th>
+                                        <th>ดำเนินการ</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="submissionsTable">
+                                    <tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 20px;">ไม่มีข้อมูล</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Users Tab -->
+                <div id="usersTab" style="display: none;">
+                    <div class="message" id="usersMsg"></div>
+                    <div class="admin-card">
+                        <h3 style="color: #1e3a8a; margin: 0 0 20px; font-size: 18px; font-weight: 600;">เพิ่มผู้ใช้ใหม่</h3>
+
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>เบอร์โทรศัพท์ *</label>
+                                <input type="tel" id="newUserPhone" placeholder="0812345678" maxlength="10">
+                            </div>
+
+                            <div class="form-group">
+                                <label>ชื่อ (ไม่จำเป็น)</label>
+                                <input type="text" id="newUserName" placeholder="ชื่อช่าง">
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="addUser()" style="margin-bottom: 30px;">➕ เพิ่มผู้ใช้</button>
+                    </div>
+
+                    <div class="admin-card">
+                        <h3 style="color: #1e3a8a; margin: 0 0 20px; font-size: 18px; font-weight: 600;">ผู้ใช้ทั้งหมด</h3>
+
+                        <div class="user-list" id="usersList">
+                            <p style="color: #6b7280; text-align: center;">ไม่มีผู้ใช้</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Submission detail modal -->
+    <div id="submissionModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px;">
+        <div style="background:#fff; border-radius:12px; max-width:600px; width:100%; max-height:85vh; overflow:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:20px 24px; border-bottom:1px solid #e5e7eb;">
+                <h3 style="margin:0; color:#1e3a8a; font-size:18px;">รายละเอียดการประเมิน</h3>
+                <button onclick="closeSubmissionModal()" style="background:none; border:none; font-size:24px; cursor:pointer; color:#6b7280; line-height:1;">&times;</button>
+            </div>
+            <div id="submissionModalBody" style="padding:24px;"></div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/charts/loader.js"></script>
+    <script>
+        // Load Google Charts ตั้งแต่ต้น
+        let chartsLoaded = false;
+        google.charts.load('current', {
+            'packages':['corechart'],
+            'callback': () => { chartsLoaded = true; }
+        });
+    </script>
+    <script>
+        // 🔗 Google Apps Script URL - เปลี่ยนตรงนี้
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweZkanZQX6WJxGdtMRIui6jzctrquZ-4nId7YYe3_hsWiyyYPhix1FTksZkCKTKi8/exec';
+
+        // 📊 Google Sheet URL
+        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng/edit?gid=0#gid=0';
+
+        // 🚗 Truck Data Sheet ID (Real-time lookup)
+        const TRUCK_SHEET_ID = '1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng';
+
+        // 👥 Users Sheet ID
+        const USERS_SHEET_ID = '1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng';
+
+        let jobTypes = ['เลือกประเภทงาน'];
+        let jobTypesLoaded = false;
+        let currentUser = null;
+        let jobCount = 0;
+
+        // ========== EARLY FUNCTION DEFINITIONS (ต้องใช้งานก่อน HTML parse) ==========
+        function toggleAdminSection() {
+            const adminToggleBtn = document.querySelector('.admin-toggle-btn');
+            const adminFields = document.getElementById('adminFields');
+            if (adminToggleBtn && adminFields) {
+                adminToggleBtn.classList.toggle('expanded');
+                adminFields.classList.toggle('visible');
+            }
+        }
+
+        function handleLogin() {
+            setTimeout(() => {
+                const phone = document.getElementById('loginPhone').value.trim();
+                if (!phone) {
+                    alert('กรุณากรอกเบอร์โทร');
+                    return;
+                }
+                if (!chartsLoaded) {
+                    alert('ระบบกำลังโหลด... กรุณารอสักครู่');
+                    return;
+                }
+                const query = new google.visualization.Query(
+                    `https://docs.google.com/spreadsheets/d/${USERS_SHEET_ID}/gviz/tq?headers=1&gid=2094571933`
+                );
+                query.send(function(response) {
+                    if (response.isError()) {
+                        alert('❌ ไม่สามารถตรวจสอบผู้ใช้ได้');
+                        return;
+                    }
+                    const data = response.getDataTable();
+                    let foundUser = null;
+                    for (let i = 0; i < data.getNumberOfRows(); i++) {
+                        const userPhone = data.getValue(i, 1);
+                        if (userPhone === phone) {
+                            foundUser = {
+                                name: data.getValue(i, 0) || 'ช่าง ' + phone,
+                                phone: phone
+                            };
+                            break;
+                        }
+                    }
+                    if (!foundUser) {
+                        alert('❌ เบอร์โทรนี้ยังไม่ลงทะเบียน');
+                        return;
+                    }
+                    currentUser = foundUser;
+                    localStorage.setItem('rbs_currentUser', JSON.stringify(foundUser));
+                    showPage('formPage');
+                    document.getElementById('userInfo').textContent = `👤 ${foundUser.name || foundUser.phone}`;
+                });
+            }, 100);
+        }
+
+        // 🛡️ Fix #2: Escape HTML to prevent XSS when injecting untrusted data into innerHTML
+        function escapeHtml(value) {
+            if (value === null || value === undefined) return '';
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        // 🛡️ Fix #2: Escape a string for safe use inside a JS string within an inline handler attribute
+        function escapeJsAttr(value) {
+            return escapeHtml(String(value).replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+        }
+
+        // ดึงประเภทงานจาก Google Sheet (Column K) - Return Promise
+        function loadJobTypes() {
+            return new Promise((resolve) => {
+                if (jobTypesLoaded) {
+                    resolve();
+                    return;
+                }
+
+                const query = new google.visualization.Query(
+                    `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` +
+                    encodeURIComponent(`SELECT K`)
+                );
+
+                query.send(function(response) {
+                    if (!response.isError()) {
+                        const data = response.getDataTable();
+                        const uniqueTypes = new Set(['เลือกประเภทงาน']);
+
+                        for (let i = 0; i < data.getNumberOfRows(); i++) {
+                            const jobType = data.getValue(i, 0);
+                            if (jobType) uniqueTypes.add(jobType);
+                        }
+
+                        jobTypes = Array.from(uniqueTypes);
+                        jobTypesLoaded = true;
+                        console.log('✅ โหลดประเภทงาน:', jobTypes.length, 'รายการ');
+                    }
+                    resolve();
+                });
+            });
+        }
+
+        const criteriaList = [
+            { id: 'accuracy', label: 'ความถูกต้องของงาน' },
+            { id: 'timeliness', label: 'ความตรงเวลา' },
+            { id: 'professionalism', label: 'ความเป็นมืออาชีพ' },
+            { id: 'cleanliness', label: 'ความสะอาด/ดูแลพื้นที่' },
+            { id: 'communication', label: 'การสื่อสาร/บริการลูกค้า' }
+        ];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', async function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('installationDate').value = today;
+
+            // รอให้ Google Charts โหลดเสร็จก่อน
+            while (!chartsLoaded) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
+
+            checkAuth();
+            loadSubmissions();
+            loadUsers();
+            await loadJobTypes(); // ← ดึงประเภทงานจาก Sheet
+        });
+
+        // ========== AUTH ==========
+
+        // Fix #6: inline message on the login page (reuses #loginMsg component)
+        function showLoginMsg(text, type) {
+            const msg = document.getElementById('loginMsg');
+            if (!msg) return;
+            msg.textContent = text;
+            msg.classList.remove('success', 'error');
+            msg.classList.add(type === 'error' ? 'error' : 'success', 'show');
+        }
+
+        function handleLogin() {
+            const phone = document.getElementById('loginPhone').value.trim();
+            if (!phone) {
+                showLoginMsg('กรุณากรอกเบอร์โทร', 'error');
+                return;
+            }
+
+            // ดึง Users จาก Google Sheet
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/${USERS_SHEET_ID}/gviz/tq?headers=1&gid=0`
+            );
+
+            query.send(function(response) {
+                if (response.isError()) {
+                    showLoginMsg('❌ ไม่สามารถตรวจสอบผู้ใช้ได้', 'error');
+                    return;
+                }
+
+                const data = response.getDataTable();
+                let foundUser = null;
+
+                for (let i = 0; i < data.getNumberOfRows(); i++) {
+                    const userPhone = data.getValue(i, 1);
+                    if (userPhone === phone) {
+                        foundUser = {
+                            name: data.getValue(i, 0) || 'ช่าง ' + phone,
+                            phone: phone
+                        };
+                        break;
+                    }
+                }
+
+                if (!foundUser) {
+                    showLoginMsg('❌ เบอร์โทรนี้ยังไม่ลงทะเบียน', 'error');
+                    return;
+                }
+
+                currentUser = foundUser;
+                localStorage.setItem('rbs_currentUser', JSON.stringify(foundUser));
+                showPage('formPage');
+                document.getElementById('userInfo').textContent = `👤 ${foundUser.name || foundUser.phone}`;
+            });
+        }
+
+        // Fix #1: ตรวจสอบ Admin Credentials ฝั่ง Server (Apps Script) แทนการ hard-code ใน client
+        // Server จะคืน token ที่ใช้สำหรับ endpoint ที่ต้องเขียนข้อมูล (Fix #3)
+        function handleAdminLogin() {
+            const adminId = document.getElementById('adminId').value.trim();
+            const adminPassword = document.getElementById('adminPassword').value.trim();
+
+            if (!adminId || !adminPassword) {
+                showLoginMsg('กรุณากรอก Admin ID และ Password', 'error');
+                return;
+            }
+
+            const loginBtn = document.querySelector('#adminFields .login-submit-btn');
+            const originalText = loginBtn ? loginBtn.textContent : '';
+            if (loginBtn) {
+                loginBtn.disabled = true;
+                loginBtn.textContent = '⏳ กำลังตรวจสอบ...';
+            }
+
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'adminLogin',
+                    adminId: adminId,
+                    password: adminPassword
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && data.token) {
+                    currentUser = {
+                        name: data.name || 'Admin',
+                        phone: 'admin',
+                        isAdmin: true,
+                        token: data.token
+                    };
+                    localStorage.setItem('rbs_currentUser', JSON.stringify(currentUser));
+                    document.getElementById('userInfo').textContent = `👤 ${currentUser.name}`;
+
+                    showPage('adminPage');
+                    loadSubmissions(); // ← ดึงตรงจาก Google Sheet
+
+                    document.getElementById('adminId').value = '';
+                    document.getElementById('adminPassword').value = '';
+                } else {
+                    showLoginMsg('❌ Admin ID หรือ Password ไม่ถูกต้อง', 'error');
+                }
+            })
+            .catch(err => {
+                console.error('❌ Admin login error:', err);
+                showLoginMsg('❌ ไม่สามารถเชื่อมต่อระบบตรวจสอบสิทธิ์ได้', 'error');
+            })
+            .finally(() => {
+                if (loginBtn) {
+                    loginBtn.disabled = false;
+                    loginBtn.textContent = originalText;
+                }
+            });
+        }
+
+        // Fix #1/#3: คืน token ของ admin ที่ login อยู่ (ถ้ามี)
+        function getAdminToken() {
+            return (currentUser && currentUser.isAdmin && currentUser.token) ? currentUser.token : null;
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            localStorage.removeItem('rbs_currentUser');
+            jobCount = 0;
+            document.getElementById('jobsContainer').innerHTML = '';
+            document.getElementById('evaluationForm').reset();
+            document.getElementById('loginPhone').value = '';
+            document.getElementById('adminId').value = '';
+            document.getElementById('adminPassword').value = '';
+            showPage('loginPage');
+        }
+
+        function checkAuth() {
+            const user = localStorage.getItem('rbs_currentUser');
+            if (user) {
+                currentUser = JSON.parse(user);
+                document.getElementById('userInfo').textContent = `👤 ${currentUser.name || currentUser.phone}`;
+
+                // ถ้า Admin → ไปหน้า Admin แทน
+                if (currentUser.isAdmin) {
+                    showPage('adminPage');
+                    loadSubmissions(); // ← ดึงตรงจาก Google Sheet
+                }
+            }
+        }
+
+        // ========== PAGE NAVIGATION ==========
+        async function showPage(pageId) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            if (pageId === 'formPage') {
+                // รอให้ jobTypes โหลดเสร็จก่อน
+                await loadJobTypes();
+                if (jobCount === 0) addJob();
+            }
+        }
+
+        // Fix #6: inline message on the form page (reuses #successMsg component)
+        function showFormMsg(text, type) {
+            const msg = document.getElementById('successMsg');
+            if (!msg) return;
+            msg.textContent = text;
+            msg.classList.remove('success', 'error');
+            msg.classList.add(type === 'error' ? 'error' : 'success', 'show');
+            if (type !== 'error') setTimeout(() => msg.classList.remove('show'), 4000);
+        }
+
+        // ========== TRUCK LOOKUP (Real-time from Google Sheet) ==========
+        function lookupTruck() {
+            const truckNumber = document.getElementById('truckNumber').value.trim();
+            if (!truckNumber) {
+                showFormMsg('กรุณากรอกเลขที่ใบรถ', 'error');
+                return;
+            }
+
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` +
+                encodeURIComponent(`SELECT * WHERE J='${truckNumber}'`)
+            );
+
+            query.send(function(response) {
+                if (response.isError()) {
+                    showFormMsg('❌ Error: ' + response.getMessage(), 'error');
+                    return;
+                }
+
+                const data = response.getDataTable();
+                if (data.getNumberOfRows() === 0) {
+                    showFormMsg('❌ ไม่พบข้อมูลเลขที่ใบรถนี้', 'error');
+                    return;
+                }
+
+                // ลบงานเก่า (ถ้ามี)
+                if (jobCount > 0) {
+                    for (let i = jobCount; i > 0; i--) {
+                        const jobCard = document.getElementById('job-' + i);
+                        if (jobCard) jobCard.remove();
+                    }
+                    jobCount = 0;
+                }
+
+                // ดึงวันที่เดินทาง (Column C - index 2) จากแถวแรก
+                const travelDate = data.getValue(0, 2);
+                if (travelDate) {
+                    // แปลง Date object เป็น YYYY-MM-DD format
+                    const dateStr = travelDate instanceof Date
+                        ? travelDate.toISOString().split('T')[0]
+                        : travelDate;
+                    document.getElementById('installationDate').value = dateStr;
+                }
+
+                // Loop ทุกงาน
+                const jobCount_new = data.getNumberOfRows();
+                showFormMsg(`✅ พบ ${jobCount_new} งาน!`, 'success');
+
+                for (let rowIndex = 0; rowIndex < data.getNumberOfRows(); rowIndex++) {
+                    const jobType = data.getValue(rowIndex, 10);
+                    const storeName = data.getValue(rowIndex, 13);
+                    const branchCode = data.getValue(rowIndex, 11);
+
+                    // สร้างงานใหม่ (Fix #5: ไม่ใช้ setTimeout - addJob คืนค่า card element ทันที)
+                    const jobCard = addJob();
+                    if (jobCard) {
+                        jobCard.querySelector(`[name="job${jobCount}_customer"]`).value = storeName || '';
+                        jobCard.querySelector(`[name="job${jobCount}_type"]`).value = jobType || 'เลือกประเภทงาน';
+                        jobCard.querySelector(`[name="job${jobCount}_location"]`).value = branchCode || '';
+                    }
+                }
+            });
+        }
+
+        // ========== JOB MANAGEMENT ==========
+        function addJob() {
+            if (!currentUser) {
+                alert('กรุณาเข้าสู่ระบบก่อน');
+                return null;
+            }
+
+            jobCount++;
+            const container = document.getElementById('jobsContainer');
+            const jobCard = document.createElement('div');
+            jobCard.className = 'job-card';
+            jobCard.id = 'job-' + jobCount;
+
+            const jobTypeOptions = jobTypes.map((type, i) =>
+                `<option value="${escapeHtml(type)}" ${i === 0 ? 'selected' : ''}>${escapeHtml(type)}</option>`
+            ).join('');
+
+            const criteriaHTML = criteriaList.map(c => `
+                <div class="rating-group">
+                    <div class="rating-label">
+                        <span>${escapeHtml(c.label)}</span>
+                        <span class="rating-value"><span class="score-${jobCount}-${c.id}">5</span>/10</span>
+                    </div>
+                    <input type="range" class="rating-input" name="job${jobCount}_${c.id}"
+                           min="1" max="10" value="5" onchange="updateScores()">
+                    <div class="rating-scale">
+                        <span>ไม่ดี (1)</span>
+                        <span>ปานกลาง (5)</span>
+                        <span>ดีมาก (10)</span>
+                    </div>
+                </div>
+            `).join('');
+
+            jobCard.innerHTML = `
+                <div class="job-header">
+                    <span class="job-number">งาน #${jobCount}</span>
+                    <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})">ลบ</button>
+                </div>
+
+                <div class="form-group">
+                    <label>ชื่อลูกค้า *</label>
+                    <input type="text" name="job${jobCount}_customer" placeholder="เช่น AllGrocer's" required>
+                </div>
+
+                <div class="form-group">
+                    <label>ประเภทงาน *</label>
+                    <select name="job${jobCount}_type" required>
+                        ${jobTypeOptions}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>รหัสสาขา</label>
+                    <input type="text" name="job${jobCount}_location" placeholder="เช่น BKK01, CMH02">
+                </div>
+
+                <div class="rating-section">
+                    <h4 style="color: #1e3a8a; margin-bottom: 15px;">⭐ ประเมินคุณภาพงาน</h4>
+                    ${criteriaHTML}
+                </div>
+
+                <div class="form-group">
+                    <label>ความเห็นเพิ่มเติม</label>
+                    <textarea name="job${jobCount}_comments" placeholder="ความเห็นสำหรับงานนี้..."></textarea>
+                </div>
+            `;
+
+            container.appendChild(jobCard);
+            return jobCard;
+        }
+
+        function removeJob(id) {
+            // ขอการยืนยันก่อนลบ
+            if (confirm('คุณแน่ใจหรือว่าต้องการลบงานนี้?')) {
+                const jobCard = document.getElementById('job-' + id);
+                if (jobCard) {
+                    jobCard.remove();
+                    updateScores();
+                    alert('ลบงานสำเร็จ');
+                }
+            }
+        }
+
+        function updateScores() {
+            const jobCards = document.querySelectorAll('.job-card');
+            jobCards.forEach((card, idx) => {
+                criteriaList.forEach(c => {
+                    const input = card.querySelector(`input[name*="_${c.id}"]`);
+                    if (input) {
+                        const jobId = card.id.split('-')[1];
+                        const scoreEl = document.querySelector(`.score-${jobId}-${c.id}`);
+                        if (scoreEl) scoreEl.textContent = input.value;
+                    }
+                });
+            });
+        }
+
+        // ส่งข้อมูลไป Google Sheets
+        function sendToGoogleSheets(data) {
+            if (GOOGLE_APPS_SCRIPT_URL === 'GOOGLE_APPS_SCRIPT_URL_HERE') {
+                console.log('⚠️ URL ยังไม่ได้ตั้ง - บันทึกเฉพาะ localStorage');
+                return Promise.resolve();
+            }
+
+            return fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    console.log('✓ ส่งไป Google Sheets สำเร็จ');
+                    return true;
+                } else {
+                    console.error('❌ ข้อผิดพลาด:', result.message);
+                    return false;
+                }
+            })
+            .catch(error => {
+                console.error('❌ ข้อผิดพลาด Network:', error);
+                return false;
+            });
+        }
+
+        // ========== FORM SUBMISSION ==========
+        document.getElementById('evaluationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if (!currentUser) {
+                alert('กรุณาเข้าสู่ระบบ');
+                return;
+            }
+
+            const jobCards = document.querySelectorAll('.job-card');
+            if (jobCards.length === 0) {
+                alert('กรุณาเพิ่มงานอย่างน้อย 1 งาน');
+                return;
+            }
+
+            // Fix #6: ตรวจสอบความถูกต้องและ abort ทั้งฟอร์มเมื่อพบข้อผิดพลาด
+            const jobs = [];
+            for (let idx = 0; idx < jobCards.length; idx++) {
+                const card = jobCards[idx];
+                const jobTypeSelect = card.querySelector('select[name*="_type"]');
+                if (jobTypeSelect.value === 'เลือกประเภทงาน') {
+                    alert(`กรุณาเลือกประเภทงานสำหรับงาน #${idx + 1}`);
+                    return; // หยุดการส่งทั้งฟอร์ม
+                }
+
+                const customer = card.querySelector('input[name*="_customer"]').value.trim();
+                if (!customer) {
+                    alert(`กรุณากรอกชื่อลูกค้าสำหรับงาน #${idx + 1}`);
+                    return; // หยุดการส่งทั้งฟอร์ม
+                }
+
+                const job = {
+                    customer: customer,
+                    type: jobTypeSelect.value,
+                    location: card.querySelector('input[name*="_location"]').value,
+                    scores: {}
+                };
+
+                criteriaList.forEach(c => {
+                    const input = card.querySelector(`input[name*="_${c.id}"]`);
+                    if (input) job.scores[c.id] = parseInt(input.value);
+                });
+
+                job.comments = card.querySelector('textarea[name*="_comments"]').value;
+                jobs.push(job);
+            }
+
+            const submission = {
+                id: Date.now(),
+                timestamp: new Date().toLocaleString('th-TH'),
+                phone: currentUser.phone,
+                name: currentUser.name || currentUser.phone,
+                truckNumber: document.getElementById('truckNumber').value,
+                installationDate: document.getElementById('installationDate').value,
+                jobs: jobs
+            };
+
+            // Fix #9: ปิดปุ่มส่งระหว่างกำลังส่งเพื่อป้องกันการส่งซ้ำ
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn ? submitBtn.textContent : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.style.opacity = '0.6';
+                submitBtn.style.cursor = 'not-allowed';
+                submitBtn.textContent = '⏳ กำลังส่ง...';
+            }
+
+            const successMsg = document.getElementById('successMsg');
+
+            // ส่งไป Google Sheets (ถ้าตั้ง URL แล้ว)
+            sendToGoogleSheets(submission).then((sent) => {
+                // Fix #7: ตรวจสอบผลการส่ง - ถ้าล้มเหลวให้แสดง error และไม่ reset ฟอร์ม
+                if (sent === false) {
+                    successMsg.textContent = '❌ ส่งแบบฟอร์มไม่สำเร็จ กรุณาลองใหม่อีกครั้ง';
+                    successMsg.classList.remove('success');
+                    successMsg.classList.add('error', 'show');
+                    return; // ไม่ reset ฟอร์ม เพื่อให้ผู้ใช้ลองส่งใหม่ได้
+                }
+
+                // บันทึก localStorage เป็น backup (เฉพาะเมื่อส่งสำเร็จ)
+                let submissions = JSON.parse(localStorage.getItem('rbs_submissions') || '[]');
+                submissions.push(submission);
+                localStorage.setItem('rbs_submissions', JSON.stringify(submissions));
+
+                successMsg.classList.remove('error');
+                successMsg.classList.add('success');
+                successMsg.textContent = '✓ ส่งแบบฟอร์มเรียบร้อยแล้ว!';
+                successMsg.classList.add('show');
+
+                setTimeout(() => {
+                    document.getElementById('evaluationForm').reset();
+                    document.getElementById('jobsContainer').innerHTML = '';
+                    jobCount = 0;
+                    addJob();
+                    successMsg.classList.remove('show');
+                }, 2000);
+            })
+            .catch((err) => {
+                console.error('❌ Submit Error:', err);
+                successMsg.textContent = '❌ เกิดข้อผิดพลาดในการส่ง กรุณาลองใหม่อีกครั้ง';
+                successMsg.classList.remove('success');
+                successMsg.classList.add('error', 'show');
+            })
+            .finally(() => {
+                // Fix #9: เปิดปุ่มส่งกลับมาเสมอเมื่อเสร็จสิ้น
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.style.opacity = '';
+                    submitBtn.style.cursor = '';
+                    submitBtn.textContent = originalBtnText;
+                }
+            });
+        });
+
+        // ========== ADMIN FUNCTIONS ==========
+        function switchAdminTab(tab, el) {
+            document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+            if (el) el.classList.add('active');
+
+            if (tab === 'submissions') {
+                document.getElementById('submissionsTab').style.display = 'block';
+                document.getElementById('usersTab').style.display = 'none';
+            } else {
+                document.getElementById('submissionsTab').style.display = 'none';
+                document.getElementById('usersTab').style.display = 'block';
+            }
+        }
+
+        function refreshData() {
+            loadSubmissions(); // ← ดึงตรงจาก Google Sheet
+        }
+
+        function loadSubmissions() {
+            const tbody = document.getElementById('submissionsTable');
+
+            // Admin → ดึงจาก Google Sheet เสมอ (Real-time)
+            if (currentUser && currentUser.isAdmin) {
+                loadSubmissionsFromGoogleSheet();
+            } else {
+                // Regular User → ดึงจาก localStorage
+                const submissions = JSON.parse(localStorage.getItem('rbs_submissions') || '[]');
+
+                if (submissions.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6b7280;">ไม่มีข้อมูล</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = submissions.map(sub => {
+                    if (!sub || !sub.jobs) return '';
+
+                    let avgScore = 0;
+                    try {
+                        avgScore = sub.jobs.reduce((sum, job) => {
+                            if (!job || !job.scores) return sum;
+                            const scores = Object.values(job.scores || {});
+                            return sum + (scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0);
+                        }, 0) / (sub.jobs.length || 1);
+                    } catch (e) {
+                        console.log('⚠️ Error calculating score for submission', sub.id);
+                    }
+
+                    return `
+                        <tr>
+                            <td>${escapeHtml(sub.timestamp || '-')}</td>
+                            <td>${escapeHtml(sub.phone || '-')}</td>
+                            <td>${escapeHtml(sub.truckNumber || '-')}</td>
+                            <td>${sub.jobs ? sub.jobs.length : 0} งาน</td>
+                        <td><strong>${isNaN(avgScore) ? '-' : avgScore.toFixed(1)}/10</strong></td>
+                        <td>
+                            <button class="btn-small btn-primary" onclick="viewSubmission(${sub.id})" style="margin-right: 5px;">ดู</button>
+                            <button class="btn-small btn-danger" onclick="deleteSubmission(${sub.id})">ลบ</button>
+                        </td>
+                    </tr>
+                `;
+                }).join('');
+            }
+        }
+
+        // Fix #2: parse jobs blob (Column F), calculate average score, render working View/Delete
+        function loadSubmissionsFromGoogleSheet() {
+            const tbody = document.getElementById('submissionsTable');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6b7280;">กำลังโหลด...</td></tr>';
+
+            // cache-bust so freshly deleted rows do not reappear from gviz cache
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng/gviz/tq?headers=1&gid=0&_=${Date.now()}`
+            );
+
+            query.send(function(response) {
+                if (response.isError()) {
+                    console.error('❌ Query Error:', response.getMessage());
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #dc2626;">❌ ไม่สามารถโหลดข้อมูลได้</td></tr>';
+                    return;
+                }
+
+                const data = response.getDataTable();
+                if (data.getNumberOfRows() === 0) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #6b7280;">ไม่มีข้อมูล</td></tr>';
+                    return;
+                }
+
+                const numCols = data.getNumberOfColumns();
+                const rows = [];
+                for (let i = 0; i < data.getNumberOfRows(); i++) {
+                    const timestamp = data.getValue(i, 0) || '-';
+                    const phone = data.getValue(i, 1) || '-';
+                    const truckNumber = data.getValue(i, 2) || '-';
+                    const jobsInfo = data.getValue(i, 3) || '-';
+                    const id = numCols > 4 ? data.getValue(i, 4) : '';
+
+                    // Fix #2: parse jobs blob (Column F = index 5) and compute average score
+                    let avgDisplay = '-';
+                    let jobCount = jobsInfo && jobsInfo !== '-' ? jobsInfo.split(';').length : 0;
+                    if (numCols > 5) {
+                        const blobRaw = data.getValue(i, 5);
+                        if (blobRaw) {
+                            try {
+                                const blob = JSON.parse(blobRaw);
+                                const jobs = blob.jobs || [];
+                                if (jobs.length) jobCount = jobs.length;
+                                let total = 0, counted = 0;
+                                jobs.forEach(job => {
+                                    const scores = Object.values(job.scores || {});
+                                    if (scores.length) {
+                                        total += scores.reduce((a, b) => a + Number(b), 0) / scores.length;
+                                        counted++;
+                                    }
+                                });
+                                if (counted > 0) avgDisplay = (total / counted).toFixed(1) + '/10';
+                            } catch (e) {
+                                console.log('⚠️ Cannot parse jobs blob for row', i);
+                            }
+                        }
+                    }
+
+                    const actions = id
+                        ? `<button class="btn-small btn-primary" onclick="viewSubmission('${escapeJsAttr(id)}')" style="margin-right: 5px;">ดู</button>
+                           <button class="btn-small btn-danger" onclick="deleteSubmission('${escapeJsAttr(id)}')">ลบ</button>`
+                        : `<button class="btn-small btn-secondary" style="cursor: not-allowed; opacity: 0.5;">อ่านอย่างเดียว</button>`;
+
+                    rows.push(`
+                        <tr>
+                            <td>${escapeHtml(timestamp)}</td>
+                            <td>${escapeHtml(phone)}</td>
+                            <td>${escapeHtml(truckNumber)}</td>
+                            <td>${jobCount} งาน</td>
+                            <td><strong>${escapeHtml(avgDisplay)}</strong></td>
+                            <td>${actions}</td>
+                        </tr>
+                    `);
+                }
+
+                tbody.innerHTML = rows.join('');
+                console.log('✅ โหลดข้อมูล:', data.getNumberOfRows(), 'entries');
+            });
+        }
+
+        // Fix #6: inline message instead of alert() on the admin page
+        function showAdminMsg(text, type) {
+            const msg = document.getElementById('adminMsg');
+            if (!msg) return;
+            msg.textContent = text;
+            msg.classList.remove('success', 'error');
+            msg.classList.add(type === 'error' ? 'error' : 'success', 'show');
+            setTimeout(() => msg.classList.remove('show'), 4000);
+        }
+
+        function closeSubmissionModal() {
+            document.getElementById('submissionModal').style.display = 'none';
+        }
+
+        // Fix #6: inline message for the users tab
+        function showUsersMsg(text, type) {
+            const msg = document.getElementById('usersMsg');
+            if (!msg) return;
+            msg.textContent = text;
+            msg.classList.remove('success', 'error');
+            msg.classList.add(type === 'error' ? 'error' : 'success', 'show');
+            setTimeout(() => msg.classList.remove('show'), 4000);
+        }
+
+        // Fix #1 critical: admin View — fetch detail from Sheet (token-gated) and render in modal
+        function viewSubmission(id) {
+            // Regular user → still read from localStorage backup
+            if (!(currentUser && currentUser.isAdmin)) {
+                const submissions = JSON.parse(localStorage.getItem('rbs_submissions') || '[]');
+                const submission = submissions.find(s => String(s.id) === String(id));
+                if (submission) renderSubmissionModal(submission);
+                return;
+            }
+
+            const token = getAdminToken();
+            if (!token) {
+                showAdminMsg('❌ ไม่มีสิทธิ์ดำเนินการ กรุณาเข้าสู่ระบบ Admin ใหม่', 'error');
+                return;
+            }
+
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'getSubmissionDetail', token: token, id: id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success && data.submission) {
+                    renderSubmissionModal(data.submission);
+                } else {
+                    showAdminMsg('❌ ไม่พบรายละเอียดของรายการนี้', 'error');
+                }
+            })
+            .catch(err => {
+                console.error('❌ View error:', err);
+                showAdminMsg('❌ ไม่สามารถโหลดรายละเอียดได้', 'error');
+            });
+        }
+
+        function renderSubmissionModal(sub) {
+            const criteriaLabels = {
+                accuracy: 'ความถูกต้องของงาน',
+                timeliness: 'ความตรงเวลา',
+                professionalism: 'ความเป็นมืออาชีพ',
+                cleanliness: 'ความสะอาด/ดูแลพื้นที่',
+                communication: 'การสื่อสาร/บริการลูกค้า'
+            };
+
+            const jobs = sub.jobs || [];
+            const jobsHtml = jobs.length ? jobs.map((job, idx) => {
+                const scores = job.scores || {};
+                const vals = Object.values(scores);
+                const avg = vals.length ? (vals.reduce((a, b) => a + Number(b), 0) / vals.length).toFixed(1) : '-';
+                const scoreRows = Object.keys(scores).map(k =>
+                    `<div style="display:flex; justify-content:space-between; padding:2px 0;">
+                        <span style="color:#6b7280;">${escapeHtml(criteriaLabels[k] || k)}</span>
+                        <strong>${escapeHtml(scores[k])}/10</strong>
+                     </div>`
+                ).join('');
+                return `
+                    <div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; margin-bottom:12px;">
+                        <div style="font-weight:700; color:#667eea; margin-bottom:8px;">งาน #${idx + 1} — ${escapeHtml(job.customer || '-')} (${escapeHtml(job.type || '-')})</div>
+                        <div style="font-size:13px; color:#6b7280; margin-bottom:8px;">รหัสสาขา: ${escapeHtml(job.location || '-')}</div>
+                        ${scoreRows}
+                        <div style="display:flex; justify-content:space-between; padding-top:6px; margin-top:6px; border-top:1px dashed #e5e7eb;">
+                            <span>คะแนนเฉลี่ย</span><strong>${escapeHtml(avg)}/10</strong>
+                        </div>
+                        ${job.comments ? `<div style="margin-top:8px; font-size:13px; color:#374151;">💬 ${escapeHtml(job.comments)}</div>` : ''}
+                    </div>`;
+            }).join('') : '<p style="color:#6b7280;">ไม่มีรายละเอียดงาน</p>';
+
+            document.getElementById('submissionModalBody').innerHTML = `
+                <div style="margin-bottom:16px; font-size:14px; line-height:1.8;">
+                    <div><strong>วันที่ส่ง:</strong> ${escapeHtml(sub.timestamp || '-')}</div>
+                    <div><strong>เบอร์โทร:</strong> ${escapeHtml(sub.phone || '-')}</div>
+                    <div><strong>ใบรถ:</strong> ${escapeHtml(sub.truckNumber || '-')}</div>
+                    <div><strong>วันที่ติดตั้ง:</strong> ${escapeHtml(sub.installationDate || '-')}</div>
+                    <div><strong>จำนวนงาน:</strong> ${jobs.length}</div>
+                </div>
+                ${jobsHtml}
+            `;
+            document.getElementById('submissionModal').style.display = 'flex';
+        }
+
+        // Fix #1 critical: admin Delete — remove row from Sheet (token-gated)
+        function deleteSubmission(id) {
+            if (!confirm('คุณแน่ใจหรือว่าต้องการลบข้อมูลนี้? (ไม่สามารถคืนได้)')) return;
+
+            // Regular user → delete from localStorage backup
+            if (!(currentUser && currentUser.isAdmin)) {
+                let submissions = JSON.parse(localStorage.getItem('rbs_submissions') || '[]');
+                submissions = submissions.filter(s => String(s.id) !== String(id));
+                localStorage.setItem('rbs_submissions', JSON.stringify(submissions));
+                loadSubmissions();
+                return;
+            }
+
+            const token = getAdminToken();
+            if (!token) {
+                showAdminMsg('❌ ไม่มีสิทธิ์ดำเนินการ กรุณาเข้าสู่ระบบ Admin ใหม่', 'error');
+                return;
+            }
+
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'deleteSubmissionFromSheet', token: token, id: id })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.success) {
+                    showAdminMsg('✅ ลบข้อมูลสำเร็จ', 'success');
+                    loadSubmissions();
+                } else {
+                    showAdminMsg('❌ ลบข้อมูลไม่สำเร็จ: ' + (data && data.error ? data.error : ''), 'error');
+                }
+            })
+            .catch(err => {
+                console.error('❌ Delete error:', err);
+                showAdminMsg('❌ ลบข้อมูลไม่สำเร็จ', 'error');
+            });
+        }
+
+        // Fix #4: ป้องกัน CSV formula injection (=, +, -, @, tab, CR) และ escape เครื่องหมายคำพูด
+        function csvCell(value) {
+            let str = (value === null || value === undefined) ? '' : String(value);
+            // นำหน้าด้วย ' ถ้าขึ้นต้นด้วยอักขระที่อาจถูกตีความเป็นสูตร
+            if (/^[=+\-@\t\r]/.test(str)) {
+                str = "'" + str;
+            }
+            // escape เครื่องหมายคำพูดและครอบด้วยเครื่องหมายคำพูดเสมอ
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+
+        // Fix #8: สร้างไฟล์ CSV ดาวน์โหลด (ใช้ร่วมกัน)
+        function downloadCSV(csv, filename) {
+            const BOM = '﻿';
+            const blob = new Blob([BOM + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+
+        function exportCSV() {
+            // Fix #8: Admin ส่งออกข้อมูลจาก Google Sheet (ข้อมูลจริงทั้งระบบ) พร้อมคอลัมน์เฉลี่ย
+            if (currentUser && currentUser.isAdmin) {
+                exportSheetCSV();
+                return;
+            }
+
+            const submissions = JSON.parse(localStorage.getItem('rbs_submissions') || '[]');
+            if (submissions.length === 0) {
+                alert('ไม่มีข้อมูลที่จะส่งออก');
+                return;
+            }
+
+            let csv = 'ลำดับ,วันที่,เบอร์โทร,ชื่อ,ใบรถ,งาน,ลูกค้า,ประเภทงาน,สถานที่,ความถูกต้อง,ความตรงเวลา,ความเป็นมืออาชีพ,ความสะอาด,การสื่อสาร,เฉลี่ย,ความเห็น\n';
+
+            submissions.forEach((sub, idx) => {
+                sub.jobs.forEach((job, jobIdx) => {
+                    const scores = Object.values(job.scores);
+                    const avg = (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+                    csv += [
+                        csvCell(idx + 1),
+                        csvCell(sub.timestamp),
+                        csvCell(sub.phone),
+                        csvCell(sub.name),
+                        csvCell(sub.truckNumber),
+                        csvCell(jobIdx + 1),
+                        csvCell(job.customer),
+                        csvCell(job.type),
+                        csvCell(job.location),
+                        csvCell(job.scores.accuracy),
+                        csvCell(job.scores.timeliness),
+                        csvCell(job.scores.professionalism),
+                        csvCell(job.scores.cleanliness),
+                        csvCell(job.scores.communication),
+                        csvCell(avg),
+                        csvCell(job.comments)
+                    ].join(',') + '\n';
+                });
+            });
+
+            downloadCSV(csv, `rbs_evaluations_${new Date().toISOString().split('T')[0]}.csv`);
+        }
+
+        // Fix #8: ส่งออกข้อมูลจาก Google Sheet สำหรับ Admin พร้อมคำนวณคอลัมน์คะแนนเฉลี่ย
+        function exportSheetCSV() {
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng/gviz/tq?headers=1&gid=0`
+            );
+
+            query.send(function(response) {
+                if (response.isError()) {
+                    alert('❌ ไม่สามารถโหลดข้อมูลจาก Google Sheet เพื่อส่งออกได้');
+                    return;
+                }
+
+                const data = response.getDataTable();
+                const numRows = data.getNumberOfRows();
+                if (numRows === 0) {
+                    alert('ไม่มีข้อมูลที่จะส่งออก');
+                    return;
+                }
+
+                const numCols = data.getNumberOfColumns();
+
+                // หาคอลัมน์คะแนน (header เป็นตัวเลข หรือชื่อ score/คะแนน) เพื่อคำนวณค่าเฉลี่ย
+                const scoreCols = [];
+                for (let c = 0; c < numCols; c++) {
+                    const label = (data.getColumnLabel(c) || '').toString().toLowerCase();
+                    const type = data.getColumnType(c);
+                    if (type === 'number' && (label.includes('score') || label.includes('คะแนน') ||
+                        label.includes('ความ') || label.includes('การ'))) {
+                        scoreCols.push(c);
+                    }
+                }
+
+                // สร้างหัวตาราง
+                const headers = [];
+                for (let c = 0; c < numCols; c++) {
+                    headers.push(csvCell(data.getColumnLabel(c) || ('Column ' + (c + 1))));
+                }
+                headers.push(csvCell('คะแนนเฉลี่ย')); // Fix #8: เพิ่มคอลัมน์เฉลี่ย
+                let csv = headers.join(',') + '\n';
+
+                for (let r = 0; r < numRows; r++) {
+                    const cells = [];
+                    let scoreSum = 0, scoreCount = 0;
+
+                    for (let c = 0; c < numCols; c++) {
+                        let v = data.getValue(r, c);
+                        if (v instanceof Date) {
+                            v = v.toISOString().split('T')[0];
+                        }
+                        cells.push(csvCell(v));
+                        if (scoreCols.includes(c) && typeof data.getValue(r, c) === 'number') {
+                            scoreSum += data.getValue(r, c);
+                            scoreCount++;
+                        }
+                    }
+
+                    const avg = scoreCount > 0 ? (scoreSum / scoreCount).toFixed(1) : '';
+                    cells.push(csvCell(avg)); // Fix #8: ค่าเฉลี่ยต่อแถว
+                    csv += cells.join(',') + '\n';
+                }
+
+                downloadCSV(csv, `rbs_evaluations_sheet_${new Date().toISOString().split('T')[0]}.csv`);
+            });
+        }
+
+        function addUser() {
+            const phone = document.getElementById('newUserPhone').value.trim();
+            const name = document.getElementById('newUserName').value.trim();
+
+            if (!phone) {
+                showUsersMsg('กรุณากรอกเบอร์โทร', 'error');
+                return;
+            }
+
+            // Fix #3: แนบ token เพื่อให้ server ตรวจสอบสิทธิ์ก่อนเขียนข้อมูล
+            const token = getAdminToken();
+            if (!token) {
+                showUsersMsg('❌ ไม่มีสิทธิ์ดำเนินการ กรุณาเข้าสู่ระบบ Admin ใหม่', 'error');
+                return;
+            }
+
+            // ส่ง User ไป Google Sheet
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'addUser',
+                    token: token,
+                    phone: phone,
+                    name: name || 'ช่าง ' + phone,
+                    timestamp: new Date().toLocaleString('th-TH')
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('newUserPhone').value = '';
+                    document.getElementById('newUserName').value = '';
+                    loadUsers();
+                    showUsersMsg('✅ เพิ่มผู้ใช้สำเร็จ', 'success');
+                } else {
+                    showUsersMsg('❌ เพิ่มผู้ใช้ไม่สำเร็จ: ' + data.error, 'error');
+                }
+            })
+            .catch(err => {
+                console.error('Error:', err);
+                showUsersMsg('❌ เพิ่มผู้ใช้ไม่สำเร็จ', 'error');
+            });
+        }
+
+        function loadUsers() {
+            const usersList = document.getElementById('usersList');
+            usersList.innerHTML = '<p style="color: #6b7280; text-align: center;">กำลังโหลด...</p>';
+
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/${USERS_SHEET_ID}/gviz/tq?headers=1&gid=2094571933`
+            );
+
+            query.send(function(response) {
+                if (response.isError()) {
+                    console.error('Error loading users:', response.getMessage());
+                    usersList.innerHTML = '<p style="color: #6b7280; text-align: center;">ไม่สามารถโหลดผู้ใช้ได้</p>';
+                    return;
+                }
+
+                const data = response.getDataTable();
+                if (data.getNumberOfRows() === 0) {
+                    user
