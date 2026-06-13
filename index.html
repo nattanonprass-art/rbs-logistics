@@ -767,6 +767,12 @@
                             <input type="text" id="installationDate" placeholder="DD/MM/YYYY" required>
                         </div>
                     </div>
+                    <div class="form-group" id="jobSelectContainer" style="display: none; margin-top: 12px;">
+                        <label>เลือกงาน *</label>
+                        <select id="jobSelect" required>
+                            <option value="">-- เลือกงาน --</option>
+                        </select>
+                    </div>
                 </div>
 
                 <div class="rating-section">
@@ -969,6 +975,36 @@
             el.classList.remove('success', 'error');
             el.classList.add(isError ? 'error' : 'success', 'show');
             if (!isError) setTimeout(() => el.classList.remove('show'), 4000);
+        }
+
+        function showToast(text, type = 'success') {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.style.cssText = `
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    padding: 16px 24px;
+                    border-radius: 8px;
+                    font-weight: 500;
+                    z-index: 9999;
+                    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                    animation: slideIn 0.3s ease;
+                `;
+                document.body.appendChild(toast);
+            }
+
+            toast.textContent = text;
+            toast.style.backgroundColor = type === 'success' ? '#10b981' : '#ef4444';
+            toast.style.color = 'white';
+            toast.style.display = 'block';
+
+            clearTimeout(toast.timeout);
+            toast.timeout = setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
         }
 
         function loginAsUser() {
@@ -1204,37 +1240,52 @@
                     console.log('Travel date set to:', dateStr);
                 }
 
-                // Add jobs
+                // Store jobs data for later use
+                window.lookupedJobs = [];
+                for (let i = 0; i < data.getNumberOfRows(); i++) {
+                    window.lookupedJobs.push({
+                        jobType: data.getValue(i, 10),
+                        branch: data.getValue(i, 11),
+                        customer: data.getValue(i, 13),
+                        customerType: data.getValue(i, 12),
+                        region: data.getValue(i, 19)
+                    });
+                }
+
                 const numRows = data.getNumberOfRows();
                 showMsg('formMsg', `✅ พบ ${numRows} งาน!`, false);
 
-                for (let i = 0; i < numRows; i++) {
-                    const jobType = data.getValue(i, 10);      // Column K: ประเภทงาน
-                    const branch = data.getValue(i, 11);       // Column L: รหัสสาขา
-                    const customer = data.getValue(i, 13);     // Column N: ชื่อลูกค้า
-                    const customerType = data.getValue(i, 12); // Column M: ประเภทลูกค้า
-                    const region = data.getValue(i, 19);       // Column T: เพิ่มภาค
+                if (numRows > 1) {
+                    // Multiple jobs: show dropdown to select
+                    document.getElementById('jobSelectContainer').style.display = 'block';
+                    const jobSelect = document.getElementById('jobSelect');
+                    jobSelect.innerHTML = '<option value="">-- เลือกงาน --</option>';
+                    for (let i = 0; i < numRows; i++) {
+                        const opt = document.createElement('option');
+                        opt.value = i;
+                        opt.text = `งาน ${i+1} - ${window.lookupedJobs[i].customer || '-'}`;
+                        jobSelect.appendChild(opt);
+                    }
+                    // Clear jobsContainer
+                    document.getElementById('jobsContainer').innerHTML = '';
+                    jobCount = 0;
+                } else {
+                    // Single job: auto-fill
+                    document.getElementById('jobSelectContainer').style.display = 'none';
+                    document.getElementById('jobsContainer').innerHTML = '';
+                    jobCount = 0;
 
-                    console.log(`Row ${i}:`, {
-                        jobType: `[${jobType}]`,
-                        branch: `[${branch}]`,
-                        customer: `[${customer}]`,
-                        customerType: `[${customerType}]`,
-                        region: `[${region}]`
-                    });
+                    const job = window.lookupedJobs[0];
+                    const jobTypeValue = job.jobType ? String(job.jobType).trim() : '';
+                    const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
 
                     const card = addJob();
                     if (card) {
-                        const jobTypeValue = jobType ? String(jobType).trim() : '';
-                        const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
-
-                        card.querySelector(`[name="job${jobCount}_customer"]`).value = customer || '';
-                        card.querySelector(`[name="job${jobCount}_customerType"]`).value = customerType || '';
+                        card.querySelector(`[name="job${jobCount}_customer"]`).value = job.customer || '';
+                        card.querySelector(`[name="job${jobCount}_customerType"]`).value = job.customerType || '';
                         card.querySelector(`[name="job${jobCount}_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
-                        card.querySelector(`[name="job${jobCount}_location"]`).value = branch || '';
-                        card.querySelector(`[name="job${jobCount}_region"]`).value = region || '';
-
-                        console.log(`Set jobType: "${jobTypeValue}" → matched: "${matchingType}"`);
+                        card.querySelector(`[name="job${jobCount}_location"]`).value = job.branch || '';
+                        card.querySelector(`[name="job${jobCount}_region"]`).value = job.region || '';
                     }
                 }
             });
@@ -1331,6 +1382,34 @@
                 return;
             }
 
+            // Check if dropdown is visible (multiple jobs case)
+            const jobSelectContainer = document.getElementById('jobSelectContainer');
+            if (jobSelectContainer.style.display === 'block') {
+                const jobSelect = document.getElementById('jobSelect');
+                const selectedIdx = jobSelect.value;
+                if (selectedIdx === '') {
+                    alert('กรุณาเลือกงาน');
+                    return;
+                }
+
+                // Create job card from selected job
+                const selectedJob = window.lookupedJobs[parseInt(selectedIdx)];
+                document.getElementById('jobsContainer').innerHTML = '';
+                jobCount = 0;
+
+                const jobTypeValue = selectedJob.jobType ? String(selectedJob.jobType).trim() : '';
+                const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
+
+                const card = addJob();
+                if (card) {
+                    card.querySelector(`[name="job${jobCount}_customer"]`).value = selectedJob.customer || '';
+                    card.querySelector(`[name="job${jobCount}_customerType"]`).value = selectedJob.customerType || '';
+                    card.querySelector(`[name="job${jobCount}_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
+                    card.querySelector(`[name="job${jobCount}_location"]`).value = selectedJob.branch || '';
+                    card.querySelector(`[name="job${jobCount}_region"]`).value = selectedJob.region || '';
+                }
+            }
+
             const cards = document.querySelectorAll('.job-card');
             if (cards.length === 0) {
                 alert('กรุณาเพิ่มงาน');
@@ -1386,9 +1465,11 @@
             .then(res => {
                 if (res.status === 'success' || res.success) {
                     showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
+                    showToast('บันทึกข้อมูลสำเร็จ ✅', 'success');
                     setTimeout(() => {
                         document.getElementById('evaluationForm').reset();
                         document.getElementById('jobsContainer').innerHTML = '';
+                        document.getElementById('jobSelectContainer').style.display = 'none';
                         jobCount = 0;
                         addJob();
                     }, 2000);
