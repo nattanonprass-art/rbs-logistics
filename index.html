@@ -1135,19 +1135,16 @@
                 if (travelDate) {
                     let dateStr = '';
                     if (travelDate instanceof Date) {
-                        // Convert Date object to yyyy-MM-dd format for input[type="date"]
-                        const year = String(travelDate.getFullYear());
-                        const month = String(travelDate.getMonth() + 1).padStart(2, '0');
+                        // Display as DD/MM/YYYY
                         const day = String(travelDate.getDate()).padStart(2, '0');
-                        dateStr = `${year}-${month}-${day}`;
+                        const month = String(travelDate.getMonth() + 1).padStart(2, '0');
+                        const year = String(travelDate.getFullYear());
+                        dateStr = `${day}/${month}/${year}`;
                     } else if (typeof travelDate === 'string') {
                         const parts = travelDate.split('/');
                         if (parts.length === 3) {
-                            // Assume DD/MM/YY format from sheet
-                            const day = parts[0];
-                            const month = parts[1];
-                            const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
-                            dateStr = `${year}-${month}-${day}`;
+                            // Already DD/MM/YY format
+                            dateStr = travelDate;
                         } else {
                             dateStr = travelDate;
                         }
