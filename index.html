@@ -1105,7 +1105,7 @@
                 }
 
                 const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` + encodeURIComponent(`SELECT * LIMIT 1`)
+                `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` + encodeURIComponent(`SELECT * WHERE J='${truck}'`)
             );
 
             query.send(resp => {
