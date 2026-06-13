@@ -1160,17 +1160,19 @@
                 showMsg('formMsg', `✅ พบ ${numRows} งาน!`, false);
 
                 for (let i = 0; i < numRows; i++) {
-                    // SELECT * returns columns A-N
-                    // Column M (index 12) = Job type, Column L (index 11) = Branch, Column N (index 13) = Customer name
-                    const jobType = data.getValue(i, 12);    // Column M: ประเภทงาน
-                    const branch = data.getValue(i, 11);     // Column L: รหัสสาขา
-                    const customer = data.getValue(i, 13);   // Column N: ชื่อลูกค้า
+                    const jobType = data.getValue(i, 10);      // Column K: ประเภทงาน
+                    const branch = data.getValue(i, 11);       // Column L: รหัสสาขา
+                    const customer = data.getValue(i, 13);     // Column N: ชื่อลูกค้า
+                    const customerType = data.getValue(i, 12); // Column M: ประเภทลูกค้า
+                    const region = data.getValue(i, 19);       // Column T: เพิ่มภาค
 
                     const card = addJob();
                     if (card) {
                         card.querySelector(`[name="job${jobCount}_customer"]`).value = customer || '';
+                        card.querySelector(`[name="job${jobCount}_customerType"]`).value = customerType || '';
                         card.querySelector(`[name="job${jobCount}_type"]`).value = jobType || 'เลือกประเภทงาน';
                         card.querySelector(`[name="job${jobCount}_location"]`).value = branch || '';
+                        card.querySelector(`[name="job${jobCount}_region"]`).value = region || '';
                     }
                 }
             });
@@ -1203,13 +1205,19 @@
             `).join('');
 
             card.innerHTML = `
-                <div class="job-header">
-                    <span class="job-number">งาน #${jobCount}</span>
+                <div class="job-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="job-number">งาน #${jobCount} <span style="font-size: 13px; color: #666;">[<input type="text" name="job${jobCount}_region" placeholder="เพิ่มภาค" style="width: 120px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">]</span></span>
                     <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})">ลบ</button>
                 </div>
-                <div class="form-group">
-                    <label>ชื่อลูกค้า *</label>
-                    <input type="text" name="job${jobCount}_customer" placeholder="เช่น AllGrocer's" required>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                    <div class="form-group">
+                        <label>ชื่อลูกค้า *</label>
+                        <input type="text" name="job${jobCount}_customer" placeholder="เช่น AllGrocer's" required>
+                    </div>
+                    <div class="form-group">
+                        <label>ประเภทลูกค้า</label>
+                        <input type="text" name="job${jobCount}_customerType" placeholder="เช่น ร้านสะดวกซื้อ">
+                    </div>
                 </div>
                 <div class="form-group">
                     <label>ประเภทงาน *</label>
@@ -1283,8 +1291,10 @@
 
                 jobs.push({
                     customer: customer,
+                    customerType: card.querySelector('input[name*="_customerType"]').value,
                     type: type,
                     location: card.querySelector('input[name*="_location"]').value,
+                    region: card.querySelector('input[name*="_region"]').value,
                     scores: Object.fromEntries(criteria.map(c => [c.id, parseInt(card.querySelector(`input[name*="_${c.id}"]`).value)])),
                     comments: card.querySelector('textarea[name*="_comments"]').value
                 });
@@ -1436,14 +1446,14 @@
                     const label = criteria.find(c => c.id === k)?.label || k;
                     return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${esc(label)}</span><strong>${esc(v)}/10</strong></div>`;
                 }).join('');
-                return `<div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; margin-bottom:12px;"><div style="font-weight:700; color:#667eea; margin-bottom:8px;">งาน #${idx+1} — ${esc(j.customer || '-')} (${esc(j.type || '-')})</div><div style="font-size:13px; color:#6b7280; margin-bottom:8px;">สาขา: ${esc(j.location || '-')}</div>${scoreRows}<div style="display:flex; justify-content:space-between; padding-top:6px; margin-top:6px; border-top:1px dashed #e5e7eb;"><span>เฉลี่ย</span><strong>${esc(avg)}/10</strong></div>${j.comments ? `<div style="margin-top:8px; font-size:13px;">💬 ${esc(j.comments)}</div>` : ''}</div>`;
+                return `<div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; margin-bottom:12px;"><div style="font-weight:700; color:#667eea; margin-bottom:8px;">งาน #${idx+1} [${esc(j.region || '-')}] — ${esc(j.customer || '-')} (${esc(j.type || '-')})</div><div style="font-size:13px; color:#6b7280; margin-bottom:8px;">ประเภท: ${esc(j.customerType || '-')} | สาขา: ${esc(j.location || '-')}</div>${scoreRows}<div style="display:flex; justify-content:space-between; padding-top:6px; margin-top:6px; border-top:1px dashed #e5e7eb;"><span>เฉลี่ย</span><strong>${esc(avg)}/10</strong></div>${j.comments ? `<div style="margin-top:8px; font-size:13px;">💬 ${esc(j.comments)}</div>` : ''}</div>`;
             }).join('') : '<p>ไม่มีข้อมูล</p>';
 
             document.getElementById('modalBody').innerHTML = `
                 <div style="margin-bottom:16px; font-size:14px; line-height:1.8;">
-                    <div><strong>ชื่อลูกค้า:</strong> ${esc(firstJob.customer || '-')}</div>
+                    <div><strong>ชื่อลูกค้า:</strong> ${esc(firstJob.customer || '-')} | <strong>ประเภท:</strong> ${esc(firstJob.customerType || '-')}</div>
                     <div><strong>ประเภทงาน:</strong> ${esc(firstJob.type || '-')}</div>
-                    <div><strong>รหัสสาขา:</strong> ${esc(firstJob.location || '-')}</div>
+                    <div><strong>รหัสสาขา:</strong> ${esc(firstJob.location || '-')} | <strong>เพิ่มภาค:</strong> ${esc(firstJob.region || '-')}</div>
                 </div>
                 ${jobsHtml}
             `;
