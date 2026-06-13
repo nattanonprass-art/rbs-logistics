@@ -882,7 +882,56 @@
         let adminToken = null;
         let jobCount = 0;
         let chartsLoaded = false;
-        let jobTypes = [];
+        let jobTypes = [
+            'Combine Logistics',
+            'ค่าดำเนินการ',
+            'ค่าเรืองาน',
+            'After Service',
+            'งาน Assortment',
+            'งาน Call Service',
+            'งาน Ceiling',
+            'งาน Facade',
+            'งาน Modify',
+            'งาน New Project',
+            'งาน O-NE',
+            'งาน Renovate',
+            'งาน Rental',
+            'งาน Special Display',
+            'งาน move on',
+            'งาน move together',
+            'งาน ยืม',
+            'งานติดตั้งงานติดตั้ง เพิ่ม/ลด',
+            'งานติดตั้งสาขาเต็ม',
+            'งานบริจาค',
+            'งานรับส่งของ',
+            'งานรื้อ (รีเพ้นท์)',
+            'งานรื้อ (เก็บ)',
+            'งานรื้อ(รีเพ้นท์+เก็บ)',
+            'งานรื้อถอน',
+            'งานส่ง DC',
+            'งานออกบูธ',
+            'งานออนไลน์',
+            'งานออนไลน์ติดตั้ง',
+            'งานอื่นๆ (มีค่าเที่ยว)',
+            'งานอื่นๆ (ไม่มีค่าเที่ยว)',
+            'งานเพิ่ม',
+            'งานโอนย้ายสินค้า',
+            'ตรวจรับหน้างาน',
+            'ย้ายคอนโด',
+            'ย้ายบ้าน',
+            'ย้ายร้านค้า',
+            'ย้ายออฟฟิส',
+            'รับสินค้าหน้าคลัง',
+            'สินค้าตัวอย่าง',
+            'สินค้าตัวอย่าง มีเก็บเงิน',
+            'ส่งพัสดุไปรษณีย์',
+            'เก็บงาน',
+            'เก็บงานติดตั้งเต็ม',
+            'เซ็นเอกสาร',
+            'เสาต่อ',
+            'เสาต่อติดตั้ง',
+            'เหมาคัน'
+        ];
 
         const criteria = [
             { id: 'accuracy', label: 'ความถูกต้องของงาน' },
@@ -1166,13 +1215,26 @@
                     const customerType = data.getValue(i, 12); // Column M: ประเภทลูกค้า
                     const region = data.getValue(i, 19);       // Column T: เพิ่มภาค
 
+                    console.log(`Row ${i}:`, {
+                        jobType: `[${jobType}]`,
+                        branch: `[${branch}]`,
+                        customer: `[${customer}]`,
+                        customerType: `[${customerType}]`,
+                        region: `[${region}]`
+                    });
+
                     const card = addJob();
                     if (card) {
+                        const jobTypeValue = jobType ? String(jobType).trim() : '';
+                        const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
+
                         card.querySelector(`[name="job${jobCount}_customer"]`).value = customer || '';
                         card.querySelector(`[name="job${jobCount}_customerType"]`).value = customerType || '';
-                        card.querySelector(`[name="job${jobCount}_type"]`).value = jobType || 'เลือกประเภทงาน';
+                        card.querySelector(`[name="job${jobCount}_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
                         card.querySelector(`[name="job${jobCount}_location"]`).value = branch || '';
                         card.querySelector(`[name="job${jobCount}_region"]`).value = region || '';
+
+                        console.log(`Set jobType: "${jobTypeValue}" → matched: "${matchingType}"`);
                     }
                 }
             });
