@@ -768,8 +768,8 @@
                         </div>
                     </div>
                     <div class="form-group" id="jobSelectContainer" style="display: none; margin-top: 12px;">
-                        <label>เลือกงาน *</label>
-                        <select id="jobSelect" required>
+                        <label>เลือกงานอื่น</label>
+                        <select id="jobSelect" onchange="switchJob(this.value)">
                             <option value="">-- เลือกงาน --</option>
                         </select>
                     </div>
@@ -1255,8 +1255,25 @@
                 const numRows = data.getNumberOfRows();
                 showMsg('formMsg', `✅ พบ ${numRows} งาน!`, false);
 
+                // Always show job #1
+                document.getElementById('jobsContainer').innerHTML = '';
+                jobCount = 0;
+
+                const job = window.lookupedJobs[0];
+                const jobTypeValue = job.jobType ? String(job.jobType).trim() : '';
+                const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
+
+                const card = addJob();
+                if (card) {
+                    card.querySelector(`[name="job${jobCount}_customer"]`).value = job.customer || '';
+                    card.querySelector(`[name="job${jobCount}_customerType"]`).value = job.customerType || '';
+                    card.querySelector(`[name="job${jobCount}_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
+                    card.querySelector(`[name="job${jobCount}_location"]`).value = job.branch || '';
+                    card.querySelector(`[name="job${jobCount}_region"]`).value = job.region || '';
+                }
+
+                // Show dropdown if multiple jobs
                 if (numRows > 1) {
-                    // Multiple jobs: show dropdown to select
                     document.getElementById('jobSelectContainer').style.display = 'block';
                     const jobSelect = document.getElementById('jobSelect');
                     jobSelect.innerHTML = '<option value="">-- เลือกงาน --</option>';
@@ -1266,27 +1283,8 @@
                         opt.text = `งาน ${i+1} - ${window.lookupedJobs[i].customer || '-'}`;
                         jobSelect.appendChild(opt);
                     }
-                    // Clear jobsContainer
-                    document.getElementById('jobsContainer').innerHTML = '';
-                    jobCount = 0;
                 } else {
-                    // Single job: auto-fill
                     document.getElementById('jobSelectContainer').style.display = 'none';
-                    document.getElementById('jobsContainer').innerHTML = '';
-                    jobCount = 0;
-
-                    const job = window.lookupedJobs[0];
-                    const jobTypeValue = job.jobType ? String(job.jobType).trim() : '';
-                    const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
-
-                    const card = addJob();
-                    if (card) {
-                        card.querySelector(`[name="job${jobCount}_customer"]`).value = job.customer || '';
-                        card.querySelector(`[name="job${jobCount}_customerType"]`).value = job.customerType || '';
-                        card.querySelector(`[name="job${jobCount}_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
-                        card.querySelector(`[name="job${jobCount}_location"]`).value = job.branch || '';
-                        card.querySelector(`[name="job${jobCount}_region"]`).value = job.region || '';
-                    }
                 }
             });
             } catch (e) {
@@ -1296,6 +1294,23 @@
         }
 
         // ======================== JOB MANAGEMENT ========================
+        function switchJob(idx) {
+            if (idx === '') return;
+
+            const selectedJob = window.lookupedJobs[parseInt(idx)];
+            const jobTypeValue = selectedJob.jobType ? String(selectedJob.jobType).trim() : '';
+            const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
+
+            const card = document.querySelector('.job-card');
+            if (card) {
+                card.querySelector(`[name*="_customer"]`).value = selectedJob.customer || '';
+                card.querySelector(`[name*="_customerType"]`).value = selectedJob.customerType || '';
+                card.querySelector(`[name*="_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
+                card.querySelector(`[name*="_location"]`).value = selectedJob.branch || '';
+                card.querySelector(`[name*="_region"]`).value = selectedJob.region || '';
+            }
+        }
+
         function addJob() {
             if (!currentUser) return null;
 
@@ -1380,34 +1395,6 @@
             if (!currentUser || currentUser.isAdmin) {
                 alert('ข้อผิดพลาด');
                 return;
-            }
-
-            // Check if dropdown is visible (multiple jobs case)
-            const jobSelectContainer = document.getElementById('jobSelectContainer');
-            if (jobSelectContainer.style.display === 'block') {
-                const jobSelect = document.getElementById('jobSelect');
-                const selectedIdx = jobSelect.value;
-                if (selectedIdx === '') {
-                    alert('กรุณาเลือกงาน');
-                    return;
-                }
-
-                // Create job card from selected job
-                const selectedJob = window.lookupedJobs[parseInt(selectedIdx)];
-                document.getElementById('jobsContainer').innerHTML = '';
-                jobCount = 0;
-
-                const jobTypeValue = selectedJob.jobType ? String(selectedJob.jobType).trim() : '';
-                const matchingType = jobTypeValue && jobTypes.find(t => t.toLowerCase() === jobTypeValue.toLowerCase());
-
-                const card = addJob();
-                if (card) {
-                    card.querySelector(`[name="job${jobCount}_customer"]`).value = selectedJob.customer || '';
-                    card.querySelector(`[name="job${jobCount}_customerType"]`).value = selectedJob.customerType || '';
-                    card.querySelector(`[name="job${jobCount}_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
-                    card.querySelector(`[name="job${jobCount}_location"]`).value = selectedJob.branch || '';
-                    card.querySelector(`[name="job${jobCount}_region"]`).value = selectedJob.region || '';
-                }
             }
 
             const cards = document.querySelectorAll('.job-card');
