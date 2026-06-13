@@ -1136,6 +1136,16 @@
 
         let jobTypes = ['เลือกประเภทงาน'];
         let jobTypesLoaded = false;
+        let currentUser = null;
+        let jobCount = 0;
+
+        // ========== EARLY FUNCTION DEFINITIONS (ต้องใช้งานก่อน HTML parse) ==========
+        function toggleAdminSection() {
+            const adminToggleBtn = document.querySelector('.admin-toggle-btn');
+            const adminFields = document.getElementById('adminFields');
+            adminToggleBtn.classList.toggle('expanded');
+            adminFields.classList.toggle('visible');
+        }
 
         // 🛡️ Fix #2: Escape HTML to prevent XSS when injecting untrusted data into innerHTML
         function escapeHtml(value) {
@@ -1193,9 +1203,6 @@
             { id: 'communication', label: 'การสื่อสาร/บริการลูกค้า' }
         ];
 
-        let currentUser = null;
-        let jobCount = 0;
-
         // Initialize
         document.addEventListener('DOMContentLoaded', async function() {
             const today = new Date().toISOString().split('T')[0];
@@ -1213,13 +1220,6 @@
         });
 
         // ========== AUTH ==========
-        function toggleAdminSection() {
-            const adminToggleBtn = document.querySelector('.admin-toggle-btn');
-            const adminFields = document.getElementById('adminFields');
-
-            adminToggleBtn.classList.toggle('expanded');
-            adminFields.classList.toggle('visible');
-        }
 
         // Fix #6: inline message on the login page (reuses #loginMsg component)
         function showLoginMsg(text, type) {
@@ -2209,6 +2209,4 @@
                 .then(data => {
                     if (data.success) {
                         loadUsers();
-                        showUsersMsg('✅ ลบผู้ใช้สำเร็จ', 'success');
-                    } else {
-                        showUsersMsg('❌ ลบผู้ใช้ไม่
+                        showUsersMsg('✅ ลบผู้ใช้สำเร็จ', '
