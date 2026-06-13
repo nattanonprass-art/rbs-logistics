@@ -1421,6 +1421,7 @@
 
         function renderModal(sub) {
             const jobs = sub.jobs || [];
+            const firstJob = jobs[0] || {};
             const jobsHtml = jobs.length ? jobs.map((j, idx) => {
                 const scores = j.scores || {};
                 const vals = Object.values(scores);
@@ -1434,10 +1435,9 @@
 
             document.getElementById('modalBody').innerHTML = `
                 <div style="margin-bottom:16px; font-size:14px; line-height:1.8;">
-                    <div><strong>วันที่ส่ง:</strong> ${esc(sub.timestamp || '-')}</div>
-                    <div><strong>เบอร์โทร:</strong> ${esc(sub.phone || '-')}</div>
-                    <div><strong>ใบรถ:</strong> ${esc(sub.truckNumber || '-')}</div>
-                    <div><strong>วันที่ติดตั้ง:</strong> ${esc(sub.installationDate || '-')}</div>
+                    <div><strong>ชื่อลูกค้า:</strong> ${esc(firstJob.customer || '-')}</div>
+                    <div><strong>ประเภทงาน:</strong> ${esc(firstJob.type || '-')}</div>
+                    <div><strong>รหัสสาขา:</strong> ${esc(firstJob.location || '-')}</div>
                 </div>
                 ${jobsHtml}
             `;
