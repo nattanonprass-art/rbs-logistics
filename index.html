@@ -1119,16 +1119,16 @@
     </script>
     <script>
         // 🔗 Google Apps Script URL - เปลี่ยนตรงนี้
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzLG9tQRr4q3ptnPedOG2ui9niDXMvQOnJMQGFtEEcTuZQog7ZySEIwALgLYUl9X4U/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweZkanZQX6WJxGdtMRIui6jzctrquZ-4nId7YYe3_hsWiyyYPhix1FTksZkCKTKi8/exec';
 
         // 📊 Google Sheet URL
-        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/14BdRyzTHUPraZr3VmW7TEgRgLRJqcKl0xBj8jOgqAgY/edit?gid=0#gid=0';
+        const GOOGLE_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng/edit?gid=0#gid=0';
 
         // 🚗 Truck Data Sheet ID (Real-time lookup)
-        const TRUCK_SHEET_ID = '1jgQkZDJKF7T45DnDeaYQN5yOsperj9eRoB8UdzndiJs';
+        const TRUCK_SHEET_ID = '1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng';
 
         // 👥 Users Sheet ID
-        const USERS_SHEET_ID = '11xeDiD8wxTY-YmfVVPuXwvTuWe7teWhQyR81AlQRVTU';
+        const USERS_SHEET_ID = '1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng';
 
         let jobTypes = ['เลือกประเภทงาน'];
         let jobTypesLoaded = false;
@@ -1750,7 +1750,7 @@
 
             // cache-bust so freshly deleted rows do not reappear from gviz cache
             const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/14BdRyzTHUPraZr3VmW7TEgRgLRJqcKl0xBj8jOgqAgY/gviz/tq?headers=1&gid=0&_=${Date.now()}`
+                `https://docs.google.com/spreadsheets/d/1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng/gviz/tq?headers=1&gid=0&_=${Date.now()}`
             );
 
             query.send(function(response) {
@@ -2030,7 +2030,7 @@
         // Fix #8: ส่งออกข้อมูลจาก Google Sheet สำหรับ Admin พร้อมคำนวณคอลัมน์คะแนนเฉลี่ย
         function exportSheetCSV() {
             const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/14BdRyzTHUPraZr3VmW7TEgRgLRJqcKl0xBj8jOgqAgY/gviz/tq?headers=1&gid=0`
+                `https://docs.google.com/spreadsheets/d/1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng/gviz/tq?headers=1&gid=0`
             );
 
             query.send(function(response) {
