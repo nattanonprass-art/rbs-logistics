@@ -56,13 +56,13 @@
         }
 
         .content {
-            display: none !important;
+            display: none;
             padding: 40px;
             animation: fadeIn 0.3s;
         }
 
         .content.active {
-            display: block !important;
+            display: block;
         }
 
         @keyframes fadeIn {
@@ -1135,19 +1135,18 @@
                 if (travelDate) {
                     let dateStr = '';
                     if (travelDate instanceof Date) {
-                        // Convert Date object to yyyy-MM-dd format for input[type="date"]
-                        const year = String(travelDate.getFullYear());
-                        const month = String(travelDate.getMonth() + 1).padStart(2, '0');
+                        // Convert Date object to DD/MM/YY format
                         const day = String(travelDate.getDate()).padStart(2, '0');
-                        dateStr = `${year}-${month}-${day}`;
+                        const month = String(travelDate.getMonth() + 1).padStart(2, '0');
+                        const year = String(travelDate.getFullYear()).slice(-2);
+                        dateStr = `${day}/${month}/${year}`;
                     } else if (typeof travelDate === 'string') {
                         const parts = travelDate.split('/');
                         if (parts.length === 3) {
-                            // Assume DD/MM/YY format from sheet
-                            const day = parts[0];
-                            const month = parts[1];
-                            const year = parts[2].length === 2 ? '20' + parts[2] : parts[2];
-                            dateStr = `${year}-${month}-${day}`;
+                            const day = String(parts[0]).padStart(2, '0');
+                            const month = String(parts[1]).padStart(2, '0');
+                            const year = parts[2];
+                            dateStr = `${day}/${month}/${year}`;
                         } else {
                             dateStr = travelDate;
                         }
@@ -1163,9 +1162,9 @@
                 showMsg('formMsg', `✅ พบ ${numRows} งาน!`, false);
 
                 for (let i = 0; i < numRows; i++) {
-                    const jobType = data.getValue(i, 2);
-                    const store = data.getValue(i, 4);
-                    const branch = data.getValue(i, 3);
+                    const jobType = data.getValue(i, 10);
+                    const store = data.getValue(i, 13);
+                    const branch = data.getValue(i, 11);
 
                     const card = addJob();
                     if (card) {
