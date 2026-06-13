@@ -939,13 +939,14 @@
 
                 const data = resp.getDataTable();
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
-                    if (data.getValue(i, 1) === phone) {
+                    if (String(data.getValue(i, 1)).trim() === String(phone).trim()) {
                         currentUser = {
                             name: data.getValue(i, 0) || 'ช่าง ' + phone,
                             phone: phone,
                             isAdmin: false
                         };
                         localStorage.setItem('rbs_user', JSON.stringify(currentUser));
+                        document.getElementById('loginPhone').value = '';
                         showPage('formPage');
                         return;
                     }
