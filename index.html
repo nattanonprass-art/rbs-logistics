@@ -1344,7 +1344,7 @@
                     if (!badge) {
                         badge = document.createElement('span');
                         badge.className = 'job-status-badge';
-                        badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: auto;';
+                        badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap;';
                         header.appendChild(badge);
                     }
                     badge.textContent = '✅ สำเร็จ';
@@ -1376,13 +1376,10 @@
             `).join('');
 
             card.innerHTML = `
-                <div class="job-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb;">
+                <div class="job-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 2px solid #e5e7eb;">
                     <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
-                        <span style="font-size: 18px;">🔶</span>
-                        <span style="font-weight: 600; color: #1e3a8a;">งาน #${jobCount}</span>
-                        <span style="color: #9ca3af;">|</span>
-                        <span style="color: #6b7280;">ภาค:</span>
-                        <input type="text" name="job${jobCount}_region" placeholder="RBSL04" style="flex: 1; max-width: 100px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                        <span style="color: #6b7280; font-weight: 500;">ภาค:</span>
+                        <input type="text" name="job${jobCount}_region" placeholder="RBSL04" style="flex: 1; max-width: 120px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
                     </div>
                     <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})" style="flex-shrink: 0;">ลบ</button>
                 </div>
@@ -1532,10 +1529,12 @@
                     }
 
                     setTimeout(() => {
-                        // Reset form but keep truck number
+                        // Reset form but keep truck number and date
                         const truckNum = document.getElementById('truckNumber').value;
+                        const installDate = document.getElementById('installationDate').value;
                         document.getElementById('evaluationForm').reset();
                         document.getElementById('truckNumber').value = truckNum;
+                        document.getElementById('installationDate').value = installDate;
 
                         document.getElementById('jobsContainer').innerHTML = '';
                         document.getElementById('jobSelectContainer').style.display = 'none';
