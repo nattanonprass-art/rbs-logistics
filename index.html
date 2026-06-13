@@ -1271,6 +1271,9 @@
                     card.querySelector(`[name="job${jobCount}_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
                     card.querySelector(`[name="job${jobCount}_location"]`).value = job.branch || '';
                     card.querySelector(`[name="job${jobCount}_region"]`).value = job.region || '';
+
+                    // Check if job is already submitted
+                    checkJobStatus(job.customer, matchingType || jobTypeValue);
                 }
 
                 // Show dropdown if multiple jobs
@@ -1309,6 +1312,35 @@
                 card.querySelector(`[name*="_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
                 card.querySelector(`[name*="_location"]`).value = selectedJob.branch || '';
                 card.querySelector(`[name*="_region"]`).value = selectedJob.region || '';
+
+                // Check if job is completed
+                checkJobStatus(selectedJob.customer, matchingType || jobTypeValue);
+            }
+        }
+
+        function checkJobStatus(customer, jobType) {
+            const truckNumber = document.getElementById('truckNumber').value;
+            const submittedJobs = JSON.parse(localStorage.getItem('submittedJobs') || '{}');
+            const jobs = submittedJobs[truckNumber] || [];
+
+            const isSubmitted = jobs.some(j =>
+                j.customer === customer && j.type === jobType
+            );
+
+            const header = document.querySelector('.job-header');
+            if (header) {
+                let badge = header.querySelector('.job-status-badge');
+                if (isSubmitted) {
+                    if (!badge) {
+                        badge = document.createElement('span');
+                        badge.className = 'job-status-badge';
+                        badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: auto;';
+                        header.appendChild(badge);
+                    }
+                    badge.textContent = '✅ สำเร็จ';
+                } else {
+                    if (badge) badge.remove();
+                }
             }
         }
 
@@ -1334,10 +1366,15 @@
             `).join('');
 
             card.innerHTML = `
-                <div class="job-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="job-number">งาน #${jobCount}</span>
-                    <input type="text" name="job${jobCount}_region" placeholder="เพิ่มภาค" style="width: 120px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
-                    <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})">ลบ</button>
+                <div class="job-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding-bottom: 12px; border-bottom: 2px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
+                        <span style="font-size: 18px;">🔶</span>
+                        <span style="font-weight: 600; color: #1e3a8a;">งาน #${jobCount}</span>
+                        <span style="color: #9ca3af;">|</span>
+                        <span style="color: #6b7280;">ภาค:</span>
+                        <input type="text" name="job${jobCount}_region" placeholder="RBSL04" style="flex: 1; max-width: 100px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                    </div>
+                    <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})" style="flex-shrink: 0;">ลบ</button>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                     <div class="form-group">
@@ -1456,6 +1493,21 @@
                     showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
                     showToast('บันทึกข้อมูลสำเร็จ ✅', 'success');
 
+                    // Save submitted job to localStorage
+                    const truckNumber = document.getElementById('truckNumber').value;
+                    const submittedJobs = JSON.parse(localStorage.getItem('submittedJobs') || '{}');
+                    if (!submittedJobs[truckNumber]) {
+                        submittedJobs[truckNumber] = [];
+                    }
+                    // Get current job index
+                    const jobData = {
+                        timestamp: new Date().toISOString(),
+                        customer: document.querySelector('input[name*="_customer"]').value,
+                        type: document.querySelector('select[name*="_type"]').value
+                    };
+                    submittedJobs[truckNumber].push(jobData);
+                    localStorage.setItem('submittedJobs', JSON.stringify(submittedJobs));
+
                     // Add success badge to current job card
                     const jobCard = document.querySelector('.job-card');
                     if (jobCard) {
@@ -1464,7 +1516,7 @@
                             const badge = document.createElement('span');
                             badge.className = 'success-badge';
                             badge.textContent = '✅ สำเร็จ';
-                            badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 12px;';
+                            badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: auto;';
                             header.appendChild(badge);
                         }
                     }
