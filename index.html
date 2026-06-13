@@ -768,8 +768,8 @@
                         </div>
                     </div>
                     <div class="form-group" id="jobSelectContainer" style="display: none; margin-top: 12px;">
-                        <label>เลือกงานอื่น</label>
-                        <select id="jobSelect" onchange="switchJob(this.value)">
+                        <label>งาน #1 <span style="color: #667eea; font-weight: 600;">(เลือกงานอื่น)</span></label>
+                        <select id="jobSelect" onchange="switchJob(this.value)" style="padding-right: 40px;">
                             <option value="">-- เลือกงาน --</option>
                         </select>
                     </div>
@@ -1242,6 +1242,7 @@
 
                 // Store jobs data for later use
                 window.lookupedJobs = [];
+                window.submittedJobs = new Set(); // Track submitted jobs
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
                     window.lookupedJobs.push({
                         jobType: data.getValue(i, 10),
@@ -1334,7 +1335,8 @@
 
             card.innerHTML = `
                 <div class="job-header" style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="job-number">งาน #${jobCount} <span style="font-size: 13px; color: #666;">[<input type="text" name="job${jobCount}_region" placeholder="เพิ่มภาค" style="width: 120px; padding: 4px; border: 1px solid #ddd; border-radius: 4px;">]</span></span>
+                    <span class="job-number">งาน #${jobCount}</span>
+                    <input type="text" name="job${jobCount}_region" placeholder="เพิ่มภาค" style="width: 120px; padding: 4px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                     <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})">ลบ</button>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
@@ -1453,6 +1455,20 @@
                 if (res.status === 'success' || res.success) {
                     showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
                     showToast('บันทึกข้อมูลสำเร็จ ✅', 'success');
+
+                    // Add success badge to current job card
+                    const jobCard = document.querySelector('.job-card');
+                    if (jobCard) {
+                        const header = jobCard.querySelector('.job-header');
+                        if (header && !header.querySelector('.success-badge')) {
+                            const badge = document.createElement('span');
+                            badge.className = 'success-badge';
+                            badge.textContent = '✅ สำเร็จ';
+                            badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; margin-left: 12px;';
+                            header.appendChild(badge);
+                        }
+                    }
+
                     setTimeout(() => {
                         document.getElementById('evaluationForm').reset();
                         document.getElementById('jobsContainer').innerHTML = '';
