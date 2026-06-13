@@ -893,12 +893,18 @@
         ];
 
         // ======================== INIT ========================
-        google.charts.load('current', { packages: ['corechart'], callback: () => { chartsLoaded = true; } });
+        // Load Google Charts and Visualization API
+        google.charts.load('current', {
+            packages: ['corechart'],
+            callback: () => {
+                chartsLoaded = true;
+                loadJobTypes();
+            }
+        });
 
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('installationDate').valueAsDate = new Date();
             checkAuth();
-            loadJobTypes();
         });
 
         // ======================== LOGIN FUNCTIONS ========================
@@ -1050,42 +1056,69 @@
 
         // ======================== JOB TYPES LOADING ========================
         function loadJobTypes() {
-            const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0&tq=SELECT K`
-            );
-
-            query.send(resp => {
-                if (!resp.isError()) {
-                    const data = resp.getDataTable();
-                    const unique = new Set(['เลือกประเภทงาน']);
-                    for (let i = 0; i < data.getNumberOfRows(); i++) {
-                        const v = data.getValue(i, 0);
-                        if (v) unique.add(v);
-                    }
-                    jobTypes = Array.from(unique);
+            try {
+                // Check if Google Charts is loaded
+                if (typeof google === 'undefined' || !google.visualization || !google.visualization.Query) {
+                    console.log('Google Charts not ready, retrying...');
+                    setTimeout(loadJobTypes, 500);
+                    return;
                 }
-            });
+
+                const query = new google.visualization.Query(
+                    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0&tq=SELECT K`
+                );
+
+                query.send(resp => {
+                    try {
+                        if (!resp.isError()) {
+                            const data = resp.getDataTable();
+                            const unique = new Set(['เลือกประเภทงาน']);
+                            for (let i = 0; i < data.getNumberOfRows(); i++) {
+                                const v = data.getValue(i, 0);
+                                if (v) unique.add(v);
+                            }
+                            jobTypes = Array.from(unique);
+                        }
+                    } catch (e) {
+                        console.error('Error processing job types:', e);
+                    }
+                });
+            } catch (e) {
+                console.error('Error loading job types:', e);
+                setTimeout(loadJobTypes, 500);
+            }
         }
 
         // ======================== TRUCK LOOKUP ========================
         function lookupTruck() {
-            const truck = document.getElementById('truckNumber').value.trim();
-            if (!truck) {
-                showMsg('formMsg', 'กรุณากรอกเลขที่ใบรถ', true);
-                return;
-            }
+            try {
+                // Check if Google Charts is loaded
+                if (typeof google === 'undefined' || !google.visualization || !google.visualization.Query) {
+                    showMsg('formMsg', 'ระบบกำลังโหลด กรุณารอสักครู่', true);
+                    return;
+                }
 
-            const query = new google.visualization.Query(
+                const truck = document.getElementById('truckNumber').value.trim();
+                if (!truck) {
+                    showMsg('formMsg', 'กรุณากรอกเลขที่ใบรถ', true);
+                    return;
+                }
+
+                const query = new google.visualization.Query(
                 `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` + encodeURIComponent(`SELECT * WHERE J='${truck}'`)
             );
 
             query.send(resp => {
+                console.log('Query response received');
                 if (resp.isError()) {
+                    console.log('Query error:', resp.getError());
                     showMsg('formMsg', '❌ ไม่พบข้อมูล', true);
                     return;
                 }
 
                 const data = resp.getDataTable();
+                console.log('Data rows:', data.getNumberOfRows(), 'Columns:', data.getNumberOfColumns());
+
                 if (data.getNumberOfRows() === 0) {
                     showMsg('formMsg', '❌ ไม่พบใบรถนี้', true);
                     return;
@@ -1095,17 +1128,36 @@
                 document.getElementById('jobsContainer').innerHTML = '';
                 jobCount = 0;
 
-                // Set travel date from Column C
-                const travelDate = data.getValue(0, 2);
+                // DEBUG: Print all columns to find correct date index
+                console.log('=== ALL COLUMNS ===');
+                const cols = data.getNumberOfColumns();
+                for (let c = 0; c < cols; c++) {
+                    const val = data.getValue(0, c);
+                    console.log(`Column ${c}: ${val}`);
+                }
+
+                // Find column with "01/05" or similar date pattern
+                let foundDateIndex = -1;
+                for (let c = 0; c < cols; c++) {
+                    const val = String(data.getValue(0, c));
+                    if (val.includes('/') && (val.includes('01/05') || val.includes('05/01'))) {
+                        foundDateIndex = c;
+                        console.log('Found correct date at index:', c, '=', val);
+                        break;
+                    }
+                }
+
+                // Use found index or default to 0
+                const dateIndex = foundDateIndex >= 0 ? foundDateIndex : 0;
+                const travelDate = data.getValue(0, dateIndex);
+
                 if (travelDate) {
                     let dateStr = '';
                     if (travelDate instanceof Date) {
                         dateStr = travelDate.toISOString().split('T')[0];
                     } else if (typeof travelDate === 'string') {
-                        // If it's already a string, try to parse and reformat
                         const parts = travelDate.split('/');
                         if (parts.length === 3) {
-                            // Handle DD/MM/YYYY or MM/DD/YYYY format
                             const day = String(parts[0]).padStart(2, '0');
                             const month = String(parts[1]).padStart(2, '0');
                             const year = parts[2];
@@ -1117,7 +1169,7 @@
                         dateStr = String(travelDate);
                     }
                     document.getElementById('installationDate').value = dateStr;
-                    console.log('Travel date set to:', dateStr);
+                    console.log('Travel date set to:', dateStr, '(from index', dateIndex, ')');
                 }
 
                 // Add jobs
@@ -1125,9 +1177,9 @@
                 showMsg('formMsg', `✅ พบ ${numRows} งาน!`, false);
 
                 for (let i = 0; i < numRows; i++) {
-                    const jobType = data.getValue(i, 10);
-                    const store = data.getValue(i, 13);
-                    const branch = data.getValue(i, 11);
+                    const jobType = data.getValue(i, 2);
+                    const store = data.getValue(i, 4);
+                    const branch = data.getValue(i, 3);
 
                     const card = addJob();
                     if (card) {
@@ -1137,6 +1189,10 @@
                     }
                 }
             });
+            } catch (e) {
+                console.error('Error in truck lookup:', e);
+                showMsg('formMsg', '❌ เกิดข้อผิดพลาด กรุณาลองใหม่', true);
+            }
         }
 
         // ======================== JOB MANAGEMENT ========================
