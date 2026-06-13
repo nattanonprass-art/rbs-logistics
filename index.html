@@ -56,13 +56,13 @@
         }
 
         .content {
-            display: none;
+            display: none !important;
             padding: 40px;
             animation: fadeIn 0.3s;
         }
 
         .content.active {
-            display: block;
+            display: block !important;
         }
 
         @keyframes fadeIn {
@@ -72,16 +72,16 @@
 
         /* ============ LOGIN PAGE ============ */
         #loginPage {
-            display: flex;
+            display: none !important;
+        }
+
+        #loginPage.active {
+            display: flex !important;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             background: linear-gradient(160deg, #1d4ed8 0%, #2563eb 45%, #3b82f6 100%);
             padding: 24px 16px;
-        }
-
-        #loginPage.active {
-            display: flex;
         }
 
         .login-wrapper {
@@ -872,7 +872,7 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
         // ======================== CONFIG ========================
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwDePFXpeJYgCv4NuL79HKPMShnb7400jyfBgI5PX0RAHqWsPfCmb_H7vhilfCYxa0/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycby0CA04RgabZchLphHLlMUvZNgVMfcLonHrReRWuEa74ldAlWxuIyfNonyp-bjC7rE/exec';
         const SHEET_ID = '1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng';
         const USERS_GID = '2094571933';
         const SUBMISSIONS_GID = '0';
