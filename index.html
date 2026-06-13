@@ -1105,7 +1105,7 @@
                 }
 
                 const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` + encodeURIComponent(`SELECT * WHERE J='${truck}'`)
+                `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` + encodeURIComponent(`SELECT * LIMIT 1`)
             );
 
             query.send(resp => {
@@ -1128,40 +1128,24 @@
                 document.getElementById('jobsContainer').innerHTML = '';
                 jobCount = 0;
 
-                // DEBUG: Print all columns to find correct date index
-                console.log('=== ALL COLUMNS ===');
-                const cols = data.getNumberOfColumns();
-                for (let c = 0; c < cols; c++) {
-                    const val = data.getValue(0, c);
-                    console.log(`Column ${c}: ${val}`);
-                }
-
-                // Find column with "01/05" or similar date pattern
-                let foundDateIndex = -1;
-                for (let c = 0; c < cols; c++) {
-                    const val = String(data.getValue(0, c));
-                    if (val.includes('/') && (val.includes('01/05') || val.includes('05/01'))) {
-                        foundDateIndex = c;
-                        console.log('Found correct date at index:', c, '=', val);
-                        break;
-                    }
-                }
-
-                // Use found index or default to 0
-                const dateIndex = foundDateIndex >= 0 ? foundDateIndex : 0;
-                const travelDate = data.getValue(0, dateIndex);
+                // Column 2 contains travel date (Fri May 01 2026)
+                const travelDate = data.getValue(0, 2);
 
                 if (travelDate) {
                     let dateStr = '';
                     if (travelDate instanceof Date) {
-                        dateStr = travelDate.toISOString().split('T')[0];
+                        // Convert Date object to DD/MM/YY format
+                        const day = String(travelDate.getDate()).padStart(2, '0');
+                        const month = String(travelDate.getMonth() + 1).padStart(2, '0');
+                        const year = String(travelDate.getFullYear()).slice(-2);
+                        dateStr = `${day}/${month}/${year}`;
                     } else if (typeof travelDate === 'string') {
                         const parts = travelDate.split('/');
                         if (parts.length === 3) {
                             const day = String(parts[0]).padStart(2, '0');
                             const month = String(parts[1]).padStart(2, '0');
                             const year = parts[2];
-                            dateStr = `${year}-${month}-${day}`;
+                            dateStr = `${day}/${month}/${year}`;
                         } else {
                             dateStr = travelDate;
                         }
@@ -1169,7 +1153,7 @@
                         dateStr = String(travelDate);
                     }
                     document.getElementById('installationDate').value = dateStr;
-                    console.log('Travel date set to:', dateStr, '(from index', dateIndex, ')');
+                    console.log('Travel date set to:', dateStr);
                 }
 
                 // Add jobs
