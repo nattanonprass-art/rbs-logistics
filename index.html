@@ -1122,6 +1122,42 @@
         });
     </script>
     <script>
+        // ==================== CRITICAL: WINDOW FUNCTIONS ====================
+        // ต้องให้เข้าถึงได้จาก onclick handlers ก่อน HTML parse เสร็จ
+        window.toggleAdminSection = function() {
+            const btn = document.querySelector('.admin-toggle-btn');
+            const fields = document.getElementById('adminFields');
+            if (btn) btn.classList.toggle('expanded');
+            if (fields) fields.classList.toggle('visible');
+        };
+
+        window.handleLogin = function() {
+            setTimeout(() => {
+                const phone = document.getElementById('loginPhone').value.trim();
+                if (!phone) { alert('กรุณากรอกเบอร์โทร'); return; }
+                if (!chartsLoaded) { alert('ระบบกำลังโหลด'); return; }
+                const query = new google.visualization.Query(
+                    `https://docs.google.com/spreadsheets/d/1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng/gviz/tq?headers=1&gid=2094571933`
+                );
+                query.send(function(response) {
+                    if (response.isError()) { alert('❌ ไม่สามารถตรวจสอบ'); return; }
+                    const data = response.getDataTable();
+                    for (let i = 0; i < data.getNumberOfRows(); i++) {
+                        if (data.getValue(i, 1) === phone) {
+                            const user = { name: data.getValue(i, 0) || 'ช่าง' + phone, phone: phone };
+                            window.currentUser = user;
+                            localStorage.setItem('rbs_currentUser', JSON.stringify(user));
+                            window.showPage('formPage');
+                            document.getElementById('userInfo').textContent = '👤 ' + user.name;
+                            return;
+                        }
+                    }
+                    alert('❌ เบอร์โทรนี้ไม่ลงทะเบียน');
+                });
+            }, 100);
+        };
+        // ====================================================================
+
         // 🔗 Google Apps Script URL - เปลี่ยนตรงนี้
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbweZkanZQX6WJxGdtMRIui6jzctrquZ-4nId7YYe3_hsWiyyYPhix1FTksZkCKTKi8/exec';
 
@@ -1136,61 +1172,15 @@
 
         let jobTypes = ['เลือกประเภทงาน'];
         let jobTypesLoaded = false;
-        let currentUser = null;
+        window.currentUser = null;
         let jobCount = 0;
 
-        // ========== EARLY FUNCTION DEFINITIONS (ต้องใช้งานก่อน HTML parse) ==========
-        function toggleAdminSection() {
-            const adminToggleBtn = document.querySelector('.admin-toggle-btn');
-            const adminFields = document.getElementById('adminFields');
-            if (adminToggleBtn && adminFields) {
-                adminToggleBtn.classList.toggle('expanded');
-                adminFields.classList.toggle('visible');
-            }
-        }
-
-        function handleLogin() {
-            setTimeout(() => {
-                const phone = document.getElementById('loginPhone').value.trim();
-                if (!phone) {
-                    alert('กรุณากรอกเบอร์โทร');
-                    return;
-                }
-                if (!chartsLoaded) {
-                    alert('ระบบกำลังโหลด... กรุณารอสักครู่');
-                    return;
-                }
-                const query = new google.visualization.Query(
-                    `https://docs.google.com/spreadsheets/d/${USERS_SHEET_ID}/gviz/tq?headers=1&gid=2094571933`
-                );
-                query.send(function(response) {
-                    if (response.isError()) {
-                        alert('❌ ไม่สามารถตรวจสอบผู้ใช้ได้');
-                        return;
-                    }
-                    const data = response.getDataTable();
-                    let foundUser = null;
-                    for (let i = 0; i < data.getNumberOfRows(); i++) {
-                        const userPhone = data.getValue(i, 1);
-                        if (userPhone === phone) {
-                            foundUser = {
-                                name: data.getValue(i, 0) || 'ช่าง ' + phone,
-                                phone: phone
-                            };
-                            break;
-                        }
-                    }
-                    if (!foundUser) {
-                        alert('❌ เบอร์โทรนี้ยังไม่ลงทะเบียน');
-                        return;
-                    }
-                    currentUser = foundUser;
-                    localStorage.setItem('rbs_currentUser', JSON.stringify(foundUser));
-                    showPage('formPage');
-                    document.getElementById('userInfo').textContent = `👤 ${foundUser.name || foundUser.phone}`;
-                });
-            }, 100);
-        }
+        // showPage function เข้าถึงได้จาก window
+        window.showPage = function(pageId) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            const page = document.getElementById(pageId);
+            if (page) page.classList.add('active');
+        };
 
         // 🛡️ Fix #2: Escape HTML to prevent XSS when injecting untrusted data into innerHTML
         function escapeHtml(value) {
@@ -2207,4 +2197,4 @@
 
                 const data = response.getDataTable();
                 if (data.getNumberOfRows() === 0) {
-                    user
+                    usersList.innerHTML = '<p style="color: #6b7280; text-al
