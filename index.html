@@ -1115,7 +1115,11 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
         // Load Google Charts ตั้งแต่ต้น
-        google.charts.load('current', {'packages':['corechart']});
+        let chartsLoaded = false;
+        google.charts.load('current', {
+            'packages':['corechart'],
+            'callback': () => { chartsLoaded = true; }
+        });
     </script>
     <script>
         // 🔗 Google Apps Script URL - เปลี่ยนตรงนี้
@@ -1196,6 +1200,11 @@
         document.addEventListener('DOMContentLoaded', async function() {
             const today = new Date().toISOString().split('T')[0];
             document.getElementById('installationDate').value = today;
+
+            // รอให้ Google Charts โหลดเสร็จก่อน
+            while (!chartsLoaded) {
+                await new Promise(resolve => setTimeout(resolve, 100));
+            }
 
             checkAuth();
             loadSubmissions();
@@ -2202,14 +2211,4 @@
                         loadUsers();
                         showUsersMsg('✅ ลบผู้ใช้สำเร็จ', 'success');
                     } else {
-                        showUsersMsg('❌ ลบผู้ใช้ไม่สำเร็จ', 'error');
-                    }
-                })
-                .catch(err => {
-                    console.error('Error:', err);
-                    showUsersMsg('❌ ลบผู้ใช้ไม่สำเร็จ', 'error');
-                });
-            }
-        }
-    </script>
-</body
+                        showUsersMsg('❌ ลบผู้ใช้ไม่
