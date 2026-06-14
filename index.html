@@ -102,10 +102,6 @@
                 grid-template-columns: 1fr;
                 max-width: 400px;
             }
-
-            .login-illustration {
-                display: none;
-            }
         }
 
         .login-logo {
@@ -133,13 +129,6 @@
             margin-bottom: 4px;
         }
 
-        .login-subtitle {
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 26px;
-        }
-
         .login-field {
             position: relative;
             margin-bottom: 16px;
@@ -148,123 +137,43 @@
         .login-field input {
             width: 100%;
             padding: 15px 16px 15px 46px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255,255,255,0.15);
             border-radius: 12px;
-            background: rgba(255, 255, 255, 0.95);
+            color: white;
             font-size: 15px;
-            color: #1e293b;
-            transition: all 0.25s;
         }
 
-        .login-field input:focus {
-            outline: none;
-            border-color: #fff;
-            background: #fff;
-        }
-
-        .login-field .field-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 18px;
+        .login-field input::placeholder {
+            color: rgba(255,255,255,0.7);
         }
 
         .login-submit-btn {
             width: 100%;
-            padding: 15px;
-            background: #fff;
-            color: #1d4ed8;
+            padding: 14px;
+            background: #667eea;
+            color: white;
             border: none;
             border-radius: 12px;
-            font-weight: 700;
+            font-size: 16px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.25s;
-            margin-top: 6px;
+            margin-top: 20px;
         }
 
         .login-submit-btn:hover {
-            background: #f1f5f9;
-            transform: translateY(-1px);
+            background: #5568d3;
         }
 
-        .login-submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .admin-section {
-            margin-top: 26px;
-            padding-top: 22px;
-            border-top: 1px solid rgba(255, 255, 255, 0.25);
-        }
-
-        .admin-toggle-btn {
-            width: 100%;
-            padding: 13px 16px;
-            background: rgba(255, 255, 255, 0.12);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 12px;
-            color: #fff;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.25s;
-        }
-
-        .admin-toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.22);
-        }
-
-        .admin-fields {
-            display: none;
-            margin-top: 14px;
-            animation: slideDown 0.3s;
-        }
-
-        .admin-fields.visible {
-            display: block;
-        }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message {
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .message.show {
-            display: block;
-        }
-
-        .message.success {
-            background: #d1fae5;
-            border-left: 4px solid #10b981;
-            color: #065f46;
-        }
-
-        .message.error {
-            background: #fee2e2;
-            border-left: 4px solid #ef4444;
-            color: #7f1d1d;
-        }
-
-        /* ============ FORM & ADMIN PAGES ============ */
+        /* ============ FORM STYLES ============ */
         .form-group {
             margin-bottom: 20px;
         }
 
         .form-group label {
             display: block;
-            font-weight: 600;
             margin-bottom: 8px;
+            font-weight: 600;
             color: #1e3a8a;
             font-size: 14px;
         }
@@ -274,18 +183,10 @@
         .form-group textarea {
             width: 100%;
             padding: 12px;
-            border: 2px solid #e5e7eb;
-            border-radius: 6px;
-            font-family: inherit;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
             font-size: 14px;
-            transition: border-color 0.3s;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #667eea;
+            font-family: inherit;
         }
 
         .form-group textarea {
@@ -293,89 +194,19 @@
             min-height: 80px;
         }
 
-        .btn {
-            padding: 14px 20px;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            width: 100%;
+        @media (max-width: 600px) {
+            .grid-2 {
+                grid-template-columns: 1fr;
+            }
         }
 
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            background: #f3f4f6;
-            color: #374151;
-            width: 100%;
-        }
-
-        .btn-secondary:hover {
-            background: #e5e7eb;
-        }
-
-        .btn-small {
-            padding: 8px 12px;
-            font-size: 13px;
-            width: auto;
-        }
-
-        .btn-danger {
-            background: #ef4444;
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background: #dc2626;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
-        }
-
-        .btn-group .btn {
-            flex: 1;
-        }
-
-        .logout-btn {
-            background: #ef4444;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 13px;
-            margin-bottom: 20px;
-        }
-
-        .logout-btn:hover {
-            background: #dc2626;
-        }
-
-        .user-info {
-            color: #1e3a8a;
-            font-size: 14px;
-            margin-bottom: 20px;
-        }
-
-        /* ============ RATING ============ */
+        /* ============ RATING SECTION ============ */
         .rating-section {
             background: #f9fafb;
             padding: 20px;
@@ -390,40 +221,34 @@
         .rating-label {
             display: flex;
             justify-content: space-between;
-            font-weight: 500;
-            color: #374151;
-            font-size: 14px;
             margin-bottom: 8px;
-        }
-
-        .rating-value {
-            background: #667eea;
-            color: white;
-            padding: 2px 12px;
-            border-radius: 20px;
-            font-weight: 600;
+            font-weight: 500;
+            font-size: 13px;
+            color: #1e3a8a;
         }
 
         .rating-input {
             width: 100%;
-            height: 8px;
-            border-radius: 5px;
+            height: 6px;
+            border-radius: 3px;
             background: #e5e7eb;
-            cursor: pointer;
+            outline: none;
+            -webkit-appearance: none;
         }
 
         .rating-input::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 22px;
-            height: 22px;
+            appearance: none;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: #667eea;
             cursor: pointer;
         }
 
         .rating-input::-moz-range-thumb {
-            width: 22px;
-            height: 22px;
+            width: 20px;
+            height: 20px;
             border-radius: 50%;
             background: #667eea;
             cursor: pointer;
@@ -434,14 +259,59 @@
             display: flex;
             justify-content: space-between;
             font-size: 11px;
-            color: #6b7280;
-            margin-top: 5px;
+            color: #9ca3af;
+            margin-top: 4px;
+        }
+
+        /* ============ BUTTON STYLES ============ */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-secondary {
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-small {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
         }
 
         /* ============ JOB CARD ============ */
         .job-card {
-            background: #f3f4f6;
-            border: 2px solid #e5e7eb;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
@@ -451,58 +321,72 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #d1d5db;
+            margin-bottom: 16px;
         }
 
         .job-number {
             font-weight: 700;
-            color: #667eea;
+            color: #1e3a8a;
             font-size: 16px;
         }
 
-        /* ============ ADMIN PAGE ============ */
+        /* ============ MESSAGE ============ */
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .message.show {
+            display: block;
+        }
+
+        .message.success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+
+        .message.error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        /* ============ ADMIN STYLES ============ */
         .admin-header {
-            background: linear-gradient(135deg, #0369A1 0%, #0EA5E9 100%);
-            color: white;
-            padding: 3rem 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 20px 40px;
+            background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+            color: white;
+            margin-bottom: 30px;
         }
 
         .admin-header h1 {
+            font-size: 24px;
             margin: 0;
-            font-size: 28px;
-        }
-
-        .admin-card {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
         }
 
         .nav-tabs {
             display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
+            gap: 0;
             border-bottom: 2px solid #e5e7eb;
-            padding-bottom: 10px;
+            margin-bottom: 30px;
+            padding: 0 40px;
         }
 
         .nav-tab {
-            padding: 8px 16px;
+            padding: 16px 24px;
             background: none;
             border: none;
             cursor: pointer;
-            font-weight: 500;
+            font-weight: 600;
             color: #6b7280;
             border-bottom: 3px solid transparent;
-            transition: all 0.3s;
+            font-size: 14px;
         }
 
         .nav-tab.active {
@@ -510,66 +394,36 @@
             border-bottom-color: #667eea;
         }
 
+        .admin-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
         .admin-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 14px;
-        }
-
-        .admin-table thead {
-            background: #f9fafb;
-            border-bottom: 2px solid #e5e7eb;
         }
 
         .admin-table th {
-            padding: 16px 12px;
+            background: #f9fafb;
+            padding: 12px;
             text-align: left;
             font-weight: 600;
-            color: #374151;
+            color: #1e3a8a;
+            border-bottom: 2px solid #e5e7eb;
+            font-size: 13px;
         }
 
         .admin-table td {
-            padding: 16px 12px;
+            padding: 12px;
             border-bottom: 1px solid #e5e7eb;
-            color: #1f2937;
+            font-size: 13px;
         }
 
-        .admin-table tbody tr:hover {
-            background: #f9fafb;
-        }
-
-        .table-responsive {
-            overflow-x: auto;
-        }
-
-        .user-list {
-            background: #f9fafb;
-            padding: 15px;
-            border-radius: 6px;
-        }
-
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px;
-            background: white;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-
-        .user-item:last-child {
-            margin-bottom: 0;
-        }
-
-        .admin-actions {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-        }
-
-        /* Modal */
+        /* ============ MODAL ============ */
         #submissionModal {
             display: none;
             position: fixed;
@@ -614,71 +468,16 @@
             cursor: pointer;
             color: #6b7280;
         }
-
-        @media (max-width: 768px) {
-            .container {
-                border-radius: 0;
-                box-shadow: none;
-            }
-
-            .content {
-                padding: 20px;
-            }
-
-            .admin-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 20px;
-            }
-
-            .admin-table {
-                font-size: 12px;
-            }
-
-            .admin-table th,
-            .admin-table td {
-                padding: 12px 8px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            #loginPage {
-                padding: 18px 14px;
-            }
-
-            .login-wrapper {
-                padding: 30px 20px;
-                border-radius: 20px;
-            }
-        }
-
-        .grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-        }
-
-        @media (max-width: 600px) {
-            .grid-2 {
-                grid-template-columns: 1fr;
-            }
-        }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- HEADER -->
-        <div class="header">
-            <h1>🛠️ ระบบประเมินการติดตั้ง Shelf</h1>
-            <p>RBS Group - ประเมินคุณภาพงานและทีมงาน</p>
-        </div>
-
         <!-- LOGIN PAGE -->
-        <div id="loginPage" class="content active">
+        <div id="loginPage" class="active">
             <div class="login-wrapper">
                 <div style="text-align: center;">
                     <div class="login-logo">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" xmlns="http://www.w3.org/2000/svg">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                             <line x1="5" y1="4" x2="5" y2="20"/>
                             <line x1="19" y1="4" x2="19" y2="20"/>
                             <line x1="5" y1="7" x2="19" y2="7"/>
@@ -687,98 +486,79 @@
                         </svg>
                     </div>
                     <h1 class="login-brand">RBS Logistics</h1>
-                    <p class="login-subtitle">ระบบประเมินการติดตั้ง Shelf สำหรับทีมช่าง</p>
+                    <p class="login-subtitle">ระบบประเมินการติดตั้ง Shelf</p>
 
                     <div class="message" id="loginMsg"></div>
 
                     <div class="login-field">
-                        <span class="field-icon">📱</span>
                         <input type="tel" id="loginPhone" placeholder="เบอร์โทรศัพท์" onkeypress="if(event.key==='Enter')loginAsUser()">
                     </div>
-
-                    <button class="login-submit-btn" onclick="loginAsUser()">LOGIN</button>
-
-                    <div class="admin-section">
-                        <button type="button" class="admin-toggle-btn" onclick="toggleAdminPanel()">
-                            <span>🔐 สำหรับ Admin</span>
-                            <span>▼</span>
-                        </button>
-
-                        <div id="adminPanel" class="admin-fields">
-                            <div class="login-field">
-                                <span class="field-icon">👤</span>
-                                <input type="text" id="adminId" placeholder="Admin ID">
-                            </div>
-                            <div class="login-field">
-                                <span class="field-icon">🔒</span>
-                                <input type="password" id="adminPassword" placeholder="Password" onkeypress="if(event.key==='Enter')loginAsAdmin()">
-                            </div>
-                            <button class="login-submit-btn" onclick="loginAsAdmin()">เข้าสู่ระบบ Admin</button>
-                        </div>
-                    </div>
+                    <button class="login-submit-btn" onclick="loginAsUser()">👨‍🔧 LOGIN</button>
                 </div>
 
-                <div class="login-illustration" style="display: flex; align-items: center; justify-content: center;">
-                    <svg viewBox="0 0 420 360" xmlns="http://www.w3.org/2000/svg" style="width: 100%; max-width: 400px; height: auto;">
-                        <defs>
-                            <linearGradient id="boxA" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0" stop-color="#38BDF8"/>
-                                <stop offset="1" stop-color="#0EA5E9"/>
-                            </linearGradient>
-                            <linearGradient id="boxB" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="0" stop-color="#0EA5E9"/>
-                                <stop offset="1" stop-color="#0369A1"/>
-                            </linearGradient>
-                        </defs>
-                        <circle cx="210" cy="170" r="170" fill="#ffffff" opacity="0.10"/>
-                        <rect x="78" y="46" width="14" height="280" rx="6" fill="url(#boxA)"/>
-                        <rect x="328" y="46" width="14" height="280" rx="6" fill="url(#boxA)"/>
-                        <rect x="72" y="40" width="276" height="16" rx="7" fill="#0369A1"/>
-                        <rect x="78" y="118" width="264" height="14" rx="6" fill="url(#boxB)"/>
-                        <rect x="78" y="200" width="264" height="14" rx="6" fill="url(#boxB)"/>
-                        <rect x="78" y="282" width="264" height="14" rx="6" fill="url(#boxB)"/>
-                    </svg>
+                <div style="text-align: center; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 36px;">
+                    <h2 style="font-size: 18px; margin-bottom: 20px;">🔐 Admin</h2>
+                    <div class="login-field">
+                        <input type="text" id="adminId" placeholder="Admin ID" onkeypress="if(event.key==='Enter')loginAsAdmin()">
+                    </div>
+                    <div class="login-field">
+                        <input type="password" id="adminPassword" placeholder="Password" onkeypress="if(event.key==='Enter')loginAsAdmin()">
+                    </div>
+                    <button class="login-submit-btn" style="background: #10b981;" onclick="loginAsAdmin()">🔓 LOGIN</button>
                 </div>
             </div>
         </div>
 
-        <!-- FORM PAGE -->
-        <div id="formPage" class="content">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <div class="user-info" id="userInfo">👤 ผู้ใช้</div>
+        <!-- TECHNICIAN FORM PAGE -->
+        <div id="technicianPage" class="content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h1>🛠️ ระบบประเมินการติดตั้ง Shelf</h1>
                 <button class="logout-btn" onclick="logout()">ออกจากระบบ</button>
             </div>
 
             <div class="message" id="formMsg"></div>
 
             <form id="evaluationForm" onsubmit="submitForm(event)">
+                <!-- ข้อมูลทั่วไป -->
                 <div class="rating-section">
                     <h3 style="color: #1e3a8a; margin-bottom: 15px;">📋 ข้อมูลทั่วไป</h3>
                     <div class="grid-2">
                         <div class="form-group">
                             <label>หมายเลขใบรถ *</label>
                             <div style="display: flex; gap: 8px;">
-                                <input type="text" id="truckNumber" placeholder="เช่น T2606041" style="flex: 1;">
-                                <button type="button" class="btn btn-small btn-primary" onclick="lookupTruck()" style="width: auto;">🔍 ค้นหา</button>
+                                <input type="text" id="truckNumber" placeholder="เช่น T2604054" style="flex: 1;">
+                                <button type="button" class="btn btn-primary btn-small" onclick="lookupTruck()" style="width: auto;">🔍 ค้นหา</button>
                             </div>
                         </div>
                         <div class="form-group">
                             <label>วันที่ติดตั้ง *</label>
-                            <input type="text" id="installationDate" placeholder="DD/MM/YYYY" required>
+                            <input type="date" id="installationDate" required>
+                        </div>
+                    </div>
+
+                    <!-- Truck Selection Dropdown (appears when multiple jobs found) -->
+                    <div id="truckSelectionDiv" style="display: none; margin-bottom: 20px;">
+                        <div class="form-group">
+                            <label>เลือกงาน *</label>
+                            <select id="truckSelectionDropdown" required onchange="loadTruckDetails()">
+                                <option value="">-- เลือกงาน --</option>
+                            </select>
                         </div>
                     </div>
                 </div>
 
+                <!-- รายการงาน -->
                 <div class="rating-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                         <h3 style="margin: 0; color: #1e3a8a;">🛠️ รายการงาน</h3>
-                        <button type="button" class="btn btn-small btn-primary" onclick="addJob()" style="width: auto;">➕ เพิ่มงาน</button>
+                        <button type="button" class="btn btn-primary btn-small" onclick="addJob()" style="width: auto;">➕ เพิ่มงาน</button>
                     </div>
                     <div id="jobsContainer"></div>
                 </div>
 
-                <div class="btn-group">
-                    <button type="submit" class="btn btn-primary">📤 ส่งแบบฟอร์ม</button>
+                <!-- Submit Button -->
+                <div style="text-align: right; margin-top: 30px;">
+                    <button type="submit" class="btn btn-primary">✅ ส่งประเมิน</button>
                     <button type="reset" class="btn btn-secondary">🔄 ล้างข้อมูล</button>
                 </div>
             </form>
@@ -804,31 +584,25 @@
                 <!-- Submissions Tab -->
                 <div id="submissionsTab">
                     <div class="message" id="submissionsMsg"></div>
-                    <div class="admin-actions">
-                        <button class="btn btn-secondary btn-small" onclick="loadSubmissions()" style="width: auto;">🔄 รีเฟรช</button>
-                        <button class="btn btn-secondary btn-small" onclick="exportCSV()" style="width: auto;">📥 CSV</button>
-                    </div>
                     <div class="admin-card">
                         <h3 style="color: #1e3a8a; margin: 0 0 20px; font-size: 18px;">ประวัติการส่งประเมิน</h3>
-                        <div class="table-responsive">
-                            <table class="admin-table">
-                                <thead>
-                                    <tr>
-                                        <th>วันที่ติดตั้ง</th>
-                                        <th>วันที่ Submit</th>
-                                        <th>เบอร์โทร</th>
-                                        <th>ใบรถ</th>
-                                        <th>ลูกค้า</th>
-                                        <th>งาน</th>
-                                        <th>เฉลี่ย</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="submissionsTable">
-                                    <tr><td colspan="8" style="text-align: center; color: #6b7280; padding: 20px;">โหลดข้อมูล...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>วันที่ติดตั้ง</th>
+                                    <th>วันที่ Submit</th>
+                                    <th>เบอร์โทร</th>
+                                    <th>ใบรถ</th>
+                                    <th>ลูกค้า</th>
+                                    <th>งาน</th>
+                                    <th>เฉลี่ย</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submissionsTable">
+                                <tr><td colspan="8" style="text-align: center; color: #6b7280; padding: 20px;">โหลดข้อมูล...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
@@ -849,12 +623,9 @@
                         </div>
                         <button class="btn btn-primary" onclick="addUser()" style="margin-bottom: 30px;">➕ เพิ่มผู้ใช้</button>
                     </div>
-
                     <div class="admin-card">
-                        <h3 style="color: #1e3a8a; margin: 0 0 20px; font-size: 18px;">ผู้ใช้ทั้งหมด</h3>
-                        <div class="user-list" id="usersList">
-                            <p style="color: #6b7280; text-align: center;">โหลดข้อมูล...</p>
-                        </div>
+                        <h3 style="color: #1e3a8a; margin: 0 0 20px; font-size: 18px;">ผู้ใช้ที่มี</h3>
+                        <div id="usersList"></div>
                     </div>
                 </div>
 
@@ -862,10 +633,7 @@
                 <div id="dashboardTab" style="display: none;">
                     <div class="admin-card">
                         <h3 style="color: #1e3a8a; margin: 0 0 20px; font-size: 18px;">📈 Dashboard</h3>
-                        <div style="text-align: center; padding: 40px; color: #9ca3af;">
-                            <p>Dashboard กำลังพัฒนา</p>
-                            <p style="font-size: 48px; margin: 20px 0;">🚀</p>
-                        </div>
+                        <p style="color: #6b7280;">Dashboard กำลังพัฒนา</p>
                     </div>
                 </div>
             </div>
@@ -889,252 +657,125 @@
         const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxwtpg9KBfBj3_2b9SksjTQwJQnOx_f7j5biJ3G0AlXyfNGMzUasi2l9VE2wgHi1Sc/exec';
         const SHEET_ID = '1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng';
         const TRUCK_SHEET_ID = '1jgQkZDJKF7T45DnDeaYQN5yOsperj9eRoB8UdzndiJs';
-        const USERS_GID = '2094571933';
-        const SUBMISSIONS_GID = '0';
 
-        let currentUser = null;
-        let adminToken = null;
-        let jobCount = 0;
-        let chartsLoaded = false;
-        let jobTypes = [];
+        // Job Types
+        const JOB_TYPES = [
+            'Combine Logistics', 'ค่าดำเนินการ', 'ค่าเรืองาน', 'After Service',
+            'งาน Assortment', 'งาน Call Service', 'งาน Ceiling', 'งาน Facade',
+            'งาน Modify', 'งาน New Project', 'งาน O-NE', 'งาน Renovate',
+            'งาน Rental', 'งาน Special Display', 'งาน move on', 'งาน move together',
+            'งาน ยืม', 'งานติดตั้ง เพิ่ม/ลด', 'งานติดตั้งสาขาเต็ม', 'งานบริจาค',
+            'งานรับส่งของ', 'งานรื้อ (รีเพ้นท์)', 'งานรื้อ (เก็บ)', 'งานรื้อ(รีเพ้นท์+เก็บ)',
+            'งานรื้อถอน', 'งานส่ง DC', 'งานออกบูธ', 'งานออนไลน์',
+            'งานออนไลน์ติดตั้ง', 'งานอื่นๆ (มีค่าเที่ยว)', 'งานอื่นๆ (ไม่มีค่าเที่ยว)',
+            'งานเพิ่ม', 'งานโอนย้ายสินค้า', 'ตรวจรับหน้างาน', 'ย้ายคอนโด',
+            'ย้ายบ้าน', 'ย้ายร้านค้า', 'ย้ายออฟฟิส', 'รับสินค้าหน้าคลัง',
+            'สินค้าตัวอย่าง', 'สินค้าตัวอย่าง มีเก็บเงิน', 'ส่งพัสดุไปรษณีย์',
+            'เก็บงาน', 'เก็บงานติดตั้งเต็ม', 'เซ็นเอกสาร', 'เสาต่อ',
+            'เสาต่อติดตั้ง', 'เหมาคัน'
+        ];
 
+        // Rating Criteria
         const criteria = [
             { id: 'accuracy', label: 'ความถูกต้องของงาน' },
             { id: 'timeliness', label: 'ความตรงเวลา' },
             { id: 'professionalism', label: 'ความเป็นมืออาชีพ' },
-            { id: 'cleanliness', label: 'ความสะอาด/ดูแลพื้นที่' },
+            { id: 'cleanliness', label: 'ความสะอาด/อุลเสิทธิ์' },
             { id: 'communication', label: 'การสื่อสาร/บริการลูกค้า' }
         ];
 
-        // ======================== INIT ========================
-        // Load Google Charts and Visualization API
-        google.charts.load('current', {
-            packages: ['corechart'],
-            callback: () => {
-                chartsLoaded = true;
-                loadJobTypes();
-            }
-        });
+        let currentUser = null;
+        let adminToken = null;
+        let jobCount = 0;
+        let selectedTruckData = null;
+        let selectedJobIndex = null;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('installationDate').valueAsDate = new Date();
-            checkAuth();
-        });
+        google.charts.load('current', { packages: ['corechart', 'table'] });
 
-        // ======================== LOGIN FUNCTIONS ========================
-        function toggleAdminPanel() {
-            const panel = document.getElementById('adminPanel');
-            panel.classList.toggle('visible');
-        }
-
-        function showMsg(elementId, text, isError) {
-            const el = document.getElementById(elementId);
-            if (!el) return;
-            el.textContent = text;
-            el.classList.remove('success', 'error');
-            el.classList.add(isError ? 'error' : 'success', 'show');
-            if (!isError) setTimeout(() => el.classList.remove('show'), 4000);
-        }
-
+        // ======================== LOGIN ========================
         function loginAsUser() {
             const phone = document.getElementById('loginPhone').value.trim();
             if (!phone) {
-                showMsg('loginMsg', 'กรุณากรอกเบอร์โทร', true);
+                showLoginMsg('กรุณากรอกเบอร์โทร', true);
                 return;
             }
-
-            if (!chartsLoaded) {
-                showMsg('loginMsg', 'ระบบกำลังโหลด', true);
-                return;
-            }
-
-            const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=${USERS_GID}`
-            );
-
-            query.send(resp => {
-                if (resp.isError()) {
-                    showMsg('loginMsg', '❌ ไม่สามารถตรวจสอบได้', true);
-                    return;
-                }
-
-                const data = resp.getDataTable();
-                for (let i = 0; i < data.getNumberOfRows(); i++) {
-                    if (String(data.getValue(i, 1)).trim() === String(phone).trim()) {
-                        currentUser = {
-                            name: data.getValue(i, 0) || 'ช่าง ' + phone,
-                            phone: phone,
-                            isAdmin: false
-                        };
-                        localStorage.setItem('rbs_user', JSON.stringify(currentUser));
-                        document.getElementById('loginPhone').value = '';
-                        showPage('formPage');
-                        return;
-                    }
-                }
-                showMsg('loginMsg', '❌ เบอร์โทรนี้ยังไม่ลงทะเบียน', true);
-            });
+            currentUser = { phone: phone, name: 'ช่าง ' + phone, isAdmin: false };
+            showPage('technicianPage');
         }
 
         function loginAsAdmin() {
-            const id = document.getElementById('adminId').value.trim();
-            const pw = document.getElementById('adminPassword').value.trim();
-
-            if (!id || !pw) {
-                showMsg('loginMsg', 'กรุณากรอก Admin ID และ Password', true);
-                return;
-            }
-
-            const btn = document.querySelector('.admin-fields .login-submit-btn');
-            const originalText = btn.textContent;
-            btn.disabled = true;
-            btn.textContent = '⏳ กำลังตรวจสอบ...';
+            const adminId = document.getElementById('adminId').value.trim();
+            const password = document.getElementById('adminPassword').value.trim();
 
             fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'adminLogin', adminId: id, password: pw })
+                body: JSON.stringify({ action: 'adminLogin', adminId: adminId, password: password })
             })
             .then(r => r.json())
             .then(data => {
-                if (data.success && data.token) {
-                    currentUser = { name: data.name, phone: 'admin', isAdmin: true };
+                if (data.success) {
+                    currentUser = { name: data.name, isAdmin: true };
                     adminToken = data.token;
-                    localStorage.setItem('rbs_user', JSON.stringify(currentUser));
-                    localStorage.setItem('rbs_token', adminToken);
                     showPage('adminPage');
                     loadSubmissions();
                     loadUsers();
-                    document.getElementById('adminId').value = '';
-                    document.getElementById('adminPassword').value = '';
                 } else {
-                    showMsg('loginMsg', '❌ Admin ID หรือ Password ไม่ถูกต้อง', true);
+                    showLoginMsg('❌ ' + (data.error || 'ไม่สำเร็จ'), true);
                 }
             })
             .catch(err => {
                 console.error(err);
-                showMsg('loginMsg', '❌ เชื่อมต่อไม่ได้', true);
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.textContent = originalText;
+                showLoginMsg('❌ เกิดข้อผิดพลาด', true);
             });
         }
 
         function logout() {
             currentUser = null;
             adminToken = null;
-            localStorage.removeItem('rbs_user');
-            localStorage.removeItem('rbs_token');
-            showPage('loginPage');
-            document.getElementById('evaluationForm').reset();
-            document.getElementById('jobsContainer').innerHTML = '';
             jobCount = 0;
+            selectedTruckData = null;
+            document.getElementById('loginPhone').value = '';
+            document.getElementById('adminId').value = '';
+            document.getElementById('adminPassword').value = '';
+            showPage('loginPage');
         }
 
-        function checkAuth() {
-            const user = localStorage.getItem('rbs_user');
-            if (user) {
-                currentUser = JSON.parse(user);
-                const token = localStorage.getItem('rbs_token');
-                if (token) adminToken = token;
-
-                document.getElementById('userInfo').textContent = '👤 ' + currentUser.name;
-
-                if (currentUser.isAdmin) {
-                    showPage('adminPage');
-                    loadSubmissions();
-                    loadUsers();
-                } else {
-                    showPage('formPage');
-                }
-            }
+        function showPage(page) {
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('technicianPage').classList.remove('active');
+            document.getElementById('adminPage').classList.remove('active');
+            document.getElementById(page).classList.add('active');
+            document.body.classList.toggle('login-mode', page === 'loginPage');
         }
 
-        // ======================== PAGE NAVIGATION ========================
-        function showPage(pageId) {
-            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-
-            if (pageId === 'formPage') {
-                document.body.classList.remove('login-mode');
-                document.querySelector('.header').classList.add('visible');
-                if (jobCount === 0) addJob();
-            } else if (pageId === 'loginPage') {
-                document.body.classList.add('login-mode');
-                document.querySelector('.header').classList.remove('visible');
-            } else {
-                document.body.classList.remove('login-mode');
-                document.querySelector('.header').classList.remove('visible');
-            }
-        }
-
-        // ======================== JOB TYPES LOADING ========================
-        function loadJobTypes() {
-            try {
-                // Check if Google Charts is loaded
-                if (typeof google === 'undefined' || !google.visualization || !google.visualization.Query) {
-                    console.log('Google Charts not ready, retrying...');
-                    setTimeout(loadJobTypes, 500);
-                    return;
-                }
-
-                const query = new google.visualization.Query(
-                    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0&tq=SELECT H`
-                );
-
-                query.send(resp => {
-                    try {
-                        if (!resp.isError()) {
-                            const data = resp.getDataTable();
-                            const unique = new Set(['เลือกประเภทงาน']);
-                            for (let i = 0; i < data.getNumberOfRows(); i++) {
-                                const v = data.getValue(i, 0);
-                                if (v) unique.add(v);
-                            }
-                            jobTypes = Array.from(unique);
-                        }
-                    } catch (e) {
-                        console.error('Error processing job types:', e);
-                    }
-                });
-            } catch (e) {
-                console.error('Error loading job types:', e);
-                setTimeout(loadJobTypes, 500);
-            }
+        function showLoginMsg(msg, isError) {
+            const el = document.getElementById('loginMsg');
+            el.textContent = msg;
+            el.className = 'message show ' + (isError ? 'error' : 'success');
         }
 
         // ======================== TRUCK LOOKUP ========================
         function lookupTruck() {
-            try {
-                // Check if Google Charts is loaded
-                if (typeof google === 'undefined' || !google.visualization || !google.visualization.Query) {
-                    showMsg('formMsg', 'ระบบกำลังโหลด กรุณารอสักครู่', true);
-                    return;
-                }
+            const truck = document.getElementById('truckNumber').value.trim();
+            if (!truck) {
+                alert('กรุณากรอกเลขที่ใบรถ');
+                return;
+            }
 
-                const truck = document.getElementById('truckNumber').value.trim();
-                if (!truck) {
-                    showMsg('formMsg', 'กรุณากรอกเลขที่ใบรถ', true);
-                    return;
-                }
-
-                const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` + encodeURIComponent(`SELECT * WHERE J CONTAINS '${truck}'`)
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/${TRUCK_SHEET_ID}/gviz/tq?headers=1&gid=0&tq=` +
+                encodeURIComponent(`SELECT * WHERE J CONTAINS '${truck}'`)
             );
 
             query.send(resp => {
-                console.log('Query response received');
                 if (resp.isError()) {
-                    console.log('Query error:', resp.getError());
-                    showMsg('formMsg', '❌ ไม่พบข้อมูล', true);
+                    alert('❌ ไม่พบใบรถนี้');
                     return;
                 }
 
                 const data = resp.getDataTable();
-                console.log('Data rows:', data.getNumberOfRows(), 'Columns:', data.getNumberOfColumns());
-
                 if (data.getNumberOfRows() === 0) {
-                    showMsg('formMsg', '❌ ไม่พบใบรถนี้', true);
+                    alert('❌ ไม่พบใบรถนี้');
                     return;
                 }
 
@@ -1142,132 +783,138 @@
                 document.getElementById('jobsContainer').innerHTML = '';
                 jobCount = 0;
 
-                // Column 2 contains travel date (Fri May 01 2026)
-                const travelDate = data.getValue(0, 2);
-                console.log('travelDate type:', travelDate instanceof Date ? 'Date' : typeof travelDate, '| value:', travelDate);
+                if (data.getNumberOfRows() === 1) {
+                    // Single job - load directly
+                    selectedJobIndex = 0;
+                    loadTruckDataFromRow(data, 0);
+                    document.getElementById('truckSelectionDiv').style.display = 'none';
+                } else {
+                    // Multiple jobs - show dropdown
+                    document.getElementById('truckSelectionDiv').style.display = 'block';
+                    const dropdown = document.getElementById('truckSelectionDropdown');
+                    dropdown.innerHTML = '<option value="">-- เลือกงาน --</option>';
 
-                if (travelDate) {
-                    let dateStr = '';
-                    if (travelDate instanceof Date) {
-                        // Display as DD/MM/YYYY
-                        const day = String(travelDate.getDate()).padStart(2, '0');
-                        const month = String(travelDate.getMonth() + 1).padStart(2, '0');
-                        const year = String(travelDate.getFullYear());
-                        dateStr = `${day}/${month}/${year}`;
-                    } else if (typeof travelDate === 'string') {
-                        const parts = travelDate.split('/');
-                        if (parts.length === 3) {
-                            // Already DD/MM/YY format
-                            dateStr = travelDate;
-                        } else {
-                            dateStr = travelDate;
-                        }
-                    } else {
-                        dateStr = String(travelDate);
+                    for (let i = 0; i < data.getNumberOfRows(); i++) {
+                        const region = data.getValue(i, 9) || 'ไม่ระบุ';
+                        const customer = data.getValue(i, 13) || 'ไม่ระบุ';
+                        const option = document.createElement('option');
+                        option.value = i;
+                        option.textContent = `ภาค: ${region} | ลูกค้า: ${customer}`;
+                        dropdown.appendChild(option);
                     }
-                    document.getElementById('installationDate').value = dateStr;
-                    console.log('Travel date set to:', dateStr);
-                }
 
-                // Add jobs
-                const numRows = data.getNumberOfRows();
-                showMsg('formMsg', `✅ พบ ${numRows} งาน!`, false);
-
-                for (let i = 0; i < numRows; i++) {
-                    // SELECT * returns columns A-N
-                    // Column M (index 12) = Job type, Column L (index 11) = Branch, Column N (index 13) = Customer name
-                    const jobType = data.getValue(i, 12);    // Column M: ประเภทงาน
-                    const branch = data.getValue(i, 11);     // Column L: รหัสสาขา
-                    const customer = data.getValue(i, 13);   // Column N: ชื่อลูกค้า
-
-                    const card = addJob();
-                    if (card) {
-                        card.querySelector(`[name="job${jobCount}_customer"]`).value = customer || '';
-                        card.querySelector(`[name="job${jobCount}_type"]`).value = jobType || 'เลือกประเภทงาน';
-                        card.querySelector(`[name="job${jobCount}_location"]`).value = branch || '';
-                    }
+                    selectedTruckData = data;
                 }
             });
-            } catch (e) {
-                console.error('Error in truck lookup:', e);
-                showMsg('formMsg', '❌ เกิดข้อผิดพลาด กรุณาลองใหม่', true);
+        }
+
+        function loadTruckDetails() {
+            const dropdown = document.getElementById('truckSelectionDropdown');
+            const index = parseInt(dropdown.value);
+            if (!isNaN(index) && selectedTruckData) {
+                document.getElementById('jobsContainer').innerHTML = '';
+                jobCount = 0;
+                loadTruckDataFromRow(selectedTruckData, index);
+                selectedJobIndex = index;
+            }
+        }
+
+        function loadTruckDataFromRow(data, rowIndex) {
+            const region = data.getValue(rowIndex, 9) || '-';
+            const jobType = data.getValue(rowIndex, 12) || 'เลือกประเภทงาน';
+            const branchCode = data.getValue(rowIndex, 11) || '';
+            const customer = data.getValue(rowIndex, 13) || '';
+
+            const card = addJob();
+            if (card) {
+                card.querySelector(`[name="job${jobCount}_customer"]`).value = customer;
+                card.querySelector(`[name="job${jobCount}_type"]`).value = jobType;
+                card.querySelector(`[name="job${jobCount}_location"]`).value = branchCode;
+                // Region shown in job header, not stored in input
+                card.querySelector('.job-region').textContent = `ภาค: ${region}`;
             }
         }
 
         // ======================== JOB MANAGEMENT ========================
         function addJob() {
-            if (!currentUser) return null;
-
             jobCount++;
             const container = document.getElementById('jobsContainer');
-            const card = document.createElement('div');
-            card.className = 'job-card';
-            card.id = 'job-' + jobCount;
+            const jobCard = document.createElement('div');
+            jobCard.className = 'job-card';
+            jobCard.id = 'job-' + jobCount;
 
-            const typeOptions = jobTypes.map((t, i) => `<option value="${esc(t)}" ${i === 0 ? 'selected' : ''}>${esc(t)}</option>`).join('');
-            const scoresHtml = criteria.map(c => `
+            const typeOptions = JOB_TYPES.map(type =>
+                `<option value="${type}">${type}</option>`
+            ).join('');
+
+            const criteriaHTML = criteria.map(c => `
                 <div class="rating-group">
                     <div class="rating-label">
-                        <span>${esc(c.label)}</span>
+                        <span>${c.label}</span>
                         <span class="rating-value"><span class="score-${jobCount}-${c.id}">5</span>/10</span>
                     </div>
-                    <input type="range" class="rating-input" name="job${jobCount}_${c.id}" min="1" max="10" value="5" onchange="updateScores()">
-                    <div class="rating-scale"><span>ไม่ดี (1)</span><span>ปานกลาง (5)</span><span>ดีมาก (10)</span></div>
+                    <input type="range" class="rating-input" name="job${jobCount}_${c.id}"
+                           min="1" max="10" value="5" onchange="updateScores()">
+                    <div class="rating-scale">
+                        <span>ไม่ดี (1)</span>
+                        <span>ปานกลาง (5)</span>
+                        <span>ดีมาก (10)</span>
+                    </div>
                 </div>
             `).join('');
 
-            card.innerHTML = `
+            jobCard.innerHTML = `
                 <div class="job-header">
-                    <span class="job-number">งาน #${jobCount}</span>
-                    <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})">ลบ</button>
+                    <span class="job-region" style="font-weight: 700; color: #1e3a8a;"></span>
+                    <button type="button" class="btn btn-danger btn-small" onclick="removeJob(${jobCount})">ลบ</button>
                 </div>
+
                 <div class="form-group">
                     <label>ชื่อลูกค้า *</label>
                     <input type="text" name="job${jobCount}_customer" placeholder="เช่น AllGrocer's" required>
                 </div>
+
                 <div class="form-group">
                     <label>ประเภทงาน *</label>
-                    <select name="job${jobCount}_type" required>${typeOptions}</select>
+                    <select name="job${jobCount}_type" required>
+                        <option value="">เลือกประเภทงาน</option>
+                        ${typeOptions}
+                    </select>
                 </div>
+
                 <div class="form-group">
                     <label>รหัสสาขา</label>
                     <input type="text" name="job${jobCount}_location" placeholder="เช่น BKK01">
                 </div>
-                <div class="form-group">
-                    <label>ภาค</label>
-                    <input type="text" name="job${jobCount}_region" placeholder="เช่น กทม.">
-                </div>
+
                 <div class="rating-section">
                     <h4 style="color: #1e3a8a; margin-bottom: 15px;">⭐ ประเมินคุณภาพงาน</h4>
-                    ${scoresHtml}
+                    ${criteriaHTML}
                 </div>
+
                 <div class="form-group">
                     <label>ความเห็นเพิ่มเติม</label>
                     <textarea name="job${jobCount}_comments" placeholder="ความเห็นสำหรับงาน..."></textarea>
                 </div>
             `;
 
-            container.appendChild(card);
-            return card;
+            container.appendChild(jobCard);
+            return jobCard;
         }
 
-        function removeJob(id) {
-            if (confirm('ต้องการลบงานนี้?')) {
-                const card = document.getElementById('job-' + id);
-                if (card) card.remove();
-                updateScores();
-            }
+        function removeJob(jobNum) {
+            const card = document.getElementById('job-' + jobNum);
+            if (card) card.remove();
         }
 
         function updateScores() {
-            document.querySelectorAll('.job-card').forEach(card => {
-                const jobId = card.id.split('-')[1];
+            for (let i = 1; i <= jobCount; i++) {
                 criteria.forEach(c => {
-                    const input = card.querySelector(`input[name*="_${c.id}"]`);
-                    const display = document.querySelector(`.score-${jobId}-${c.id}`);
+                    const input = document.querySelector(`input[name="job${i}_${c.id}"]`);
+                    const display = document.querySelector(`.score-${i}-${c.id}`);
                     if (input && display) display.textContent = input.value;
                 });
-            });
+            }
         }
 
         // ======================== FORM SUBMISSION ========================
@@ -1285,79 +932,78 @@
                 return;
             }
 
-            const jobs = [];
-            for (const card of cards) {
-                const type = card.querySelector('select[name*="_type"]').value;
-                if (type === 'เลือกประเภทงาน') {
-                    alert('กรุณาเลือกประเภทงาน');
-                    return;
-                }
-
+            // Submit 1:1 - each job separately
+            for (const [idx, card] of Array.from(cards).entries()) {
                 const customer = card.querySelector('input[name*="_customer"]').value.trim();
                 if (!customer) {
-                    alert('กรุณากรอกชื่อลูกค้า');
+                    alert('กรุณากรอกชื่อลูกค้างาน ' + (idx + 1));
                     return;
                 }
 
-                jobs.push({
-                    customer: customer,
-                    type: type,
-                    location: card.querySelector('input[name*="_location"]').value,
-                    region: card.querySelector('input[name*="_region"]').value || '',
-                    scores: Object.fromEntries(criteria.map(c => [c.id, parseInt(card.querySelector(`input[name*="_${c.id}"]`).value)])),
-                    comments: card.querySelector('textarea[name*="_comments"]').value
+                const type = card.querySelector('select[name*="_type"]').value;
+                if (type === '') {
+                    alert('กรุณาเลือกประเภทงาน ' + (idx + 1));
+                    return;
+                }
+
+                const jobData = {
+                    action: 'handleSubmission',
+                    timestamp: new Date().toLocaleString('th-TH'),
+                    phone: currentUser.phone,
+                    name: currentUser.name,
+                    truckNumber: document.getElementById('truckNumber').value,
+                    installationDate: document.getElementById('installationDate').value,
+                    jobs: [{
+                        customer: customer,
+                        type: type,
+                        location: card.querySelector('input[name*="_location"]').value || '',
+                        region: card.querySelector('.job-region').textContent.replace('ภาค: ', ''),
+                        scores: Object.fromEntries(
+                            criteria.map(c => [c.id, parseInt(card.querySelector(`input[name*="_${c.id}"]`).value)])
+                        ),
+                        comments: card.querySelector('textarea[name*="_comments"]').value || ''
+                    }]
+                };
+
+                fetch(GOOGLE_APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(jobData)
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.status === 'success' || res.success) {
+                        if (idx === cards.length - 1) {
+                            showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
+                            setTimeout(() => {
+                                document.getElementById('evaluationForm').reset();
+                                document.getElementById('jobsContainer').innerHTML = '';
+                                document.getElementById('truckNumber').value = '';
+                                document.getElementById('installationDate').value = '';
+                                document.getElementById('truckSelectionDiv').style.display = 'none';
+                                jobCount = 0;
+                            }, 2000);
+                        }
+                    } else {
+                        showMsg('formMsg', '❌ ส่งไม่สำเร็จ', true);
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    showMsg('formMsg', '❌ เกิดข้อผิดพลาด', true);
                 });
             }
+        }
 
-            const data = {
-                action: 'handleSubmission',
-                timestamp: new Date().toLocaleString('th-TH'),
-                phone: currentUser.phone,
-                name: currentUser.name,
-                truckNumber: document.getElementById('truckNumber').value,
-                installationDate: document.getElementById('installationDate').value,
-                jobs: jobs
-            };
-
-            console.log('📤 Submitting data:', data);
-            console.log('📊 Jobs count:', jobs.length);
-            console.log('📋 Jobs data:', JSON.stringify(jobs, null, 2));
-
-            const btn = e.target.querySelector('button[type="submit"]');
-            btn.disabled = true;
-            const originalText = btn.textContent;
-            btn.textContent = '⏳ กำลังส่ง...';
-
-            fetch(GOOGLE_APPS_SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) })
-            .then(r => r.json())
-            .then(res => {
-                if (res.status === 'success' || res.success) {
-                    showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
-                    setTimeout(() => {
-                        document.getElementById('evaluationForm').reset();
-                        document.getElementById('jobsContainer').innerHTML = '';
-                        jobCount = 0;
-                        addJob();
-                    }, 2000);
-                } else {
-                    showMsg('formMsg', '❌ ส่งไม่สำเร็จ', true);
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                showMsg('formMsg', '❌ เกิดข้อผิดพลาด', true);
-            })
-            .finally(() => {
-                btn.disabled = false;
-                btn.textContent = originalText;
-            });
+        function showMsg(id, msg, isError) {
+            const el = document.getElementById(id);
+            el.textContent = msg;
+            el.className = 'message show ' + (isError ? 'error' : 'success');
         }
 
         // ======================== ADMIN FUNCTIONS ========================
         function switchTab(tab, el) {
             document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
             el.classList.add('active');
-
             document.getElementById('submissionsTab').style.display = tab === 'submissions' ? 'block' : 'none';
             document.getElementById('usersTab').style.display = tab === 'users' ? 'block' : 'none';
             document.getElementById('dashboardTab').style.display = tab === 'dashboard' ? 'block' : 'none';
@@ -1383,10 +1029,7 @@
                     return;
                 }
 
-                // Group rows by timestamp+phone (1 submission = multiple jobs)
                 const submissions = {};
-                const rowIndices = {}; // Store first row index for each submission
-
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
                     const timestamp = data.getValue(i, 0) || '-';
                     const phone = String(data.getValue(i, 1) || '-');
@@ -1397,7 +1040,6 @@
 
                     const key = `${timestamp}|${phone}`;
                     if (!submissions[key]) {
-                        // Ensure phone has leading 0
                         const phoneWithZero = phone && !phone.startsWith('0') ? '0' + phone : phone;
                         submissions[key] = {
                             timestamp, phone: phoneWithZero, truck, customer, installDate,
@@ -1405,7 +1047,6 @@
                             scores: [],
                             firstRowIndex: i
                         };
-                        rowIndices[key] = i;
                     }
                     submissions[key].jobCount++;
                     submissions[key].scores.push(Number(avgScore));
@@ -1418,27 +1059,22 @@
                         ? (sub.scores.reduce((a, b) => a + b, 0) / sub.scores.length).toFixed(1)
                         : '-';
 
-                    // Format install date (date only)
                     let installDateDisplay = sub.installDate;
                     if (sub.installDate instanceof Date) {
                         const d = sub.installDate;
                         installDateDisplay = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
                     }
 
-                    // Format submit date/time (display datetime in table)
                     let submitDateDisplay = sub.timestamp;
                     if (sub.timestamp instanceof Date) {
                         const d = sub.timestamp;
                         submitDateDisplay = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
-                    } else if (typeof sub.timestamp === 'string') {
-                        // If it's already a formatted string from Google Apps Script, use as-is
-                        submitDateDisplay = sub.timestamp;
                     }
 
-                    const timestampEscaped = esc(sub.timestamp).replace(/'/g, "\\'");
-                    const actions = `<button class="btn-small btn-primary" onclick="viewSubmission(${sub.firstRowIndex})" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmissionByTimestamp('${timestampEscaped}')">ลบ</button>`;
+                    const timestampEscaped = (sub.timestamp + '').replace(/'/g, "\\'");
+                    const actions = `<button class="btn btn-primary btn-small" onclick="viewSubmission(${sub.firstRowIndex})" style="margin-right: 5px;">ดู</button><button class="btn btn-danger btn-small" onclick="deleteSubmissionByTimestamp('${timestampEscaped}')">ลบ</button>`;
 
-                    rows.push(`<tr><td>${esc(installDateDisplay)}</td><td>${esc(submitDateDisplay)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgAll)}/10</strong></td><td>${actions}</td></tr>`);
+                    rows.push(`<tr><td>${installDateDisplay}</td><td>${submitDateDisplay}</td><td>${sub.phone}</td><td>${sub.truck}</td><td>${sub.customer}</td><td>${sub.jobCount}</td><td><strong>${avgAll}/10</strong></td><td>${actions}</td></tr>`);
                 }
 
                 tbody.innerHTML = rows.join('');
@@ -1451,28 +1087,23 @@
             );
 
             query.send(resp => {
-                if (resp.isError()) {
-                    showMsg('submissionsMsg', '❌ ไม่สามารถโหลด', true);
+                if (resp.isError() || rowIndex >= resp.getDataTable().getNumberOfRows()) {
+                    alert('❌ ไม่พบข้อมูล');
                     return;
                 }
 
                 const data = resp.getDataTable();
-                if (rowIndex < data.getNumberOfRows()) {
-                    const row = [];
-                    for (let i = 0; i < data.getNumberOfColumns(); i++) {
-                        row.push(data.getValue(rowIndex, i));
-                    }
-                    renderModal(row);
-                    document.getElementById('submissionModal').classList.add('active');
-                } else {
-                    showMsg('submissionsMsg', '❌ ไม่พบข้อมูล', true);
+                const row = [];
+                for (let i = 0; i < data.getNumberOfColumns(); i++) {
+                    row.push(data.getValue(rowIndex, i));
                 }
+
+                renderModal(row);
+                document.getElementById('submissionModal').classList.add('active');
             });
         }
 
         function renderModal(sub) {
-            const keys = ['Timestamp', 'Phone', 'Truck', 'InstDate', 'Name', 'Customer', 'CustType', 'JobType', 'Location', 'Region', 'Accuracy', 'Timeliness', 'Professionalism', 'Cleanliness', 'Communication', 'Comments', 'AvgScore'];
-            
             const scores = {
                 accuracy: sub[10] || '-',
                 timeliness: sub[11] || '-',
@@ -1480,65 +1111,59 @@
                 cleanliness: sub[13] || '-',
                 communication: sub[14] || '-'
             };
+
             const scoreRows = Object.entries(scores).map(([k, v]) => {
                 const label = criteria.find(c => c.id === k)?.label || k;
-                return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${esc(label)}</span><strong>${esc(v)}/10</strong></div>`;
+                return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${label}</span><strong>${v}/10</strong></div>`;
             }).join('');
 
-            // Format dates
             let submitDate = sub[0] || '-';
             let installDate = sub[3] || '-';
 
-            // Helper function to format Date objects
-            const formatDateTime = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
-            const formatDateOnly = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
-
-            // If they're Date objects, format them
             if (submitDate instanceof Date) {
-                submitDate = formatDateTime(submitDate);
-            }
-            if (installDate instanceof Date) {
-                installDate = formatDateOnly(installDate);
+                const d = submitDate;
+                submitDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
             }
 
-            // Ensure phone has leading 0
+            if (installDate instanceof Date) {
+                const d = installDate;
+                installDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+            }
+
             let phone = sub[1] || '-';
             if (phone !== '-' && !String(phone).startsWith('0')) {
                 phone = '0' + phone;
             }
 
             document.getElementById('modalBody').innerHTML = `
-                <!-- ข้อมูลทั่วไป -->
                 <div style="margin-bottom:20px; font-size:13px; line-height:1.9;">
-                    <div style="margin-bottom:6px;"><strong>วันที่ติดตั้ง:</strong> ${esc(installDate)}</div>
-                    <div style="margin-bottom:6px;"><strong>วันที่ Submit:</strong> ${esc(submitDate)}</div>
-                    <div style="margin-bottom:6px;"><strong>ชื่อช่างติดตั้ง:</strong> ${esc(sub[4] || '-')}</div>
-                    <div style="margin-bottom:6px;"><strong>เบอร์โทร:</strong> ${esc(phone)}</div>
-                    <div><strong>ใบรถ:</strong> ${esc(sub[2] || '-')}</div>
+                    <div style="margin-bottom:6px;"><strong>วันที่ติดตั้ง:</strong> ${installDate}</div>
+                    <div style="margin-bottom:6px;"><strong>วันที่ Submit:</strong> ${submitDate}</div>
+                    <div style="margin-bottom:6px;"><strong>ชื่อช่างติดตั้ง:</strong> ${sub[4] || '-'}</div>
+                    <div style="margin-bottom:6px;"><strong>เบอร์โทร:</strong> ${phone}</div>
+                    <div><strong>ใบรถ:</strong> ${sub[2] || '-'}</div>
                 </div>
 
-                <!-- ข้อมูลลูกค้า -->
                 <div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-bottom:20px;">
                     <div style="font-weight:700; color:#667eea; margin-bottom:12px; font-size:13px;">ข้อมูลลูกค้า</div>
                     <div style="font-size:13px; line-height:1.9;">
-                        <div style="margin-bottom:6px;"><strong>ชื่อลูกค้า:</strong> ${esc(sub[5] || '-')}</div>
-                        <div style="margin-bottom:6px;"><strong>ประเภทลูกค้า:</strong> ${esc(sub[6] || '-')}</div>
-                        <div style="margin-bottom:6px;"><strong>ประเภทงาน:</strong> ${esc(sub[7] || '-')}</div>
-                        <div style="margin-bottom:6px;"><strong>รหัสสาขา:</strong> ${esc(sub[8] || '-')}</div>
-                        <div><strong>ภาค:</strong> ${esc(sub[9] || '-')}</div>
+                        <div style="margin-bottom:6px;"><strong>ชื่อลูกค้า:</strong> ${sub[5] || '-'}</div>
+                        <div style="margin-bottom:6px;"><strong>ประเภทลูกค้า:</strong> ${sub[6] || '-'}</div>
+                        <div style="margin-bottom:6px;"><strong>ประเภทงาน:</strong> ${sub[7] || '-'}</div>
+                        <div style="margin-bottom:6px;"><strong>รหัสสาขา:</strong> ${sub[8] || '-'}</div>
+                        <div><strong>ภาค:</strong> ${sub[9] || '-'}</div>
                     </div>
                 </div>
 
-                <!-- การประเมิน -->
                 <div style="border-top:1px solid #e5e7eb; padding-top:16px;">
                     <div style="font-weight:700; color:#667eea; margin-bottom:12px; font-size:13px;">การประเมิน</div>
                     <div style="font-size:13px; line-height:2;">
                         ${scoreRows}
                     </div>
-                    <div style="display:flex; justify-content:space-between; padding-top:12px; margin-top:12px; border-top:1px dashed #e5e7eb; font-weight:700; font-size:13px;"><span>เฉลี่ย</span><strong>${esc(sub[16] || '-')}/10</strong></div>
+                    <div style="display:flex; justify-content:space-between; padding-top:12px; margin-top:12px; border-top:1px dashed #e5e7eb; font-weight:700; font-size:13px;"><span>เฉลี่ย</span><strong>${sub[16] || '-'}/10</strong></div>
                 </div>
 
-                ${sub[15] ? `<div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px; font-size:13px;"><strong>💬 ความเห็น:</strong> ${esc(sub[15])}</div>` : ''}
+                ${sub[15] ? `<div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px; font-size:13px;"><strong>💬 ความเห็น:</strong> ${sub[15]}</div>` : ''}
             `;
         }
 
@@ -1569,56 +1194,7 @@
             });
         }
 
-        function deleteSubmission(id) {
-            // Legacy function - kept for compatibility
-            console.warn('deleteSubmission is deprecated, use deleteSubmissionByTimestamp instead');
-        }
-
-        function exportCSV() {
-            const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0`
-            );
-
-            query.send(resp => {
-                if (resp.isError()) {
-                    alert('❌ ไม่สามารถโหลด');
-                    return;
-                }
-
-                const data = resp.getDataTable();
-                let csv = 'ลำดับ,วันที่,เบอร์โทร,เลขรถ,วันที่ติดตั้ง,ชื่อ,ลูกค้า,ประเภทลูกค้า,ประเภทงาน,สถานที่,ภาค,ความถูกต้อง,ความตรงเวลา,ความเป็นมืออาชีพ,ความสะอาด,การสื่อสาร,ความเห็น,เฉลี่ย\n';
-
-                for (let i = 0; i < data.getNumberOfRows(); i++) {
-                    const timestamp = data.getValue(i, 0) || '-';
-                    const phone = data.getValue(i, 1) || '-';
-                    const truck = data.getValue(i, 2) || '-';
-                    const installDate = data.getValue(i, 3) || '-';
-                    const name = data.getValue(i, 4) || '-';
-                    const customer = data.getValue(i, 5) || '-';
-                    const custType = data.getValue(i, 6) || '-';
-                    const jobType = data.getValue(i, 7) || '-';
-                    const location = data.getValue(i, 8) || '-';
-                    const region = data.getValue(i, 9) || '-';
-                    const accuracy = data.getValue(i, 10) || '-';
-                    const timeliness = data.getValue(i, 11) || '-';
-                    const professionalism = data.getValue(i, 12) || '-';
-                    const cleanliness = data.getValue(i, 13) || '-';
-                    const communication = data.getValue(i, 14) || '-';
-                    const comments = data.getValue(i, 15) || '-';
-                    const avgScore = data.getValue(i, 16) || '-';
-
-                    csv += `"${i+1}","${timestamp}","${phone}","${truck}","${installDate}","${name}","${customer}","${custType}","${jobType}","${location}","${region}","${accuracy}","${timeliness}","${professionalism}","${cleanliness}","${communication}","${comments}","${avgScore}"\n`;
-                }
-
-                const BOM = '﻿';
-                const blob = new Blob([BOM + csv], { type: 'text/csv' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                link.download = `rbs_${new Date().toISOString().split('T')[0]}.csv`;
-                link.click();
-            });
-        }
-
+        // ======================== USER MANAGEMENT ========================
         function addUser() {
             const phone = document.getElementById('newUserPhone').value.trim();
             const name = document.getElementById('newUserName').value.trim();
@@ -1654,7 +1230,7 @@
             list.innerHTML = '<p style="color: #6b7280; text-align: center;">กำลังโหลด...</p>';
 
             const query = new google.visualization.Query(
-                `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=${USERS_GID}`
+                `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=2094571933`
             );
 
             query.send(resp => {
@@ -1671,20 +1247,25 @@
 
                 const users = [];
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
-                    users.push({ name: data.getValue(i, 0), phone: data.getValue(i, 1) });
+                    const name = data.getValue(i, 0) || '-';
+                    const phone = data.getValue(i, 1) || '-';
+                    users.push(`
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #e5e7eb;">
+                            <div>
+                                <div style="font-weight: 600; color: #1e3a8a;">${name}</div>
+                                <div style="font-size: 13px; color: #6b7280;">${phone}</div>
+                            </div>
+                            <button class="btn btn-danger btn-small" onclick="deleteUser('${phone}')">ลบ</button>
+                        </div>
+                    `);
                 }
 
-                list.innerHTML = users.map(u => `
-                    <div class="user-item">
-                        <div><strong>${esc(u.name || '-')}</strong><br><small style="color: #6b7280;">${esc(u.phone || '-')}</small></div>
-                        <button class="btn-small btn-danger" onclick="deleteUser('${esc(u.phone)}')">ลบ</button>
-                    </div>
-                `).join('');
+                list.innerHTML = users.join('');
             });
         }
 
         function deleteUser(phone) {
-            if (!confirm('ต้องการลบ?')) return;
+            if (!confirm('ต้องการลบผู้ใช้นี้?')) return;
 
             fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
@@ -1703,11 +1284,6 @@
                 console.error(err);
                 showMsg('usersMsg', '❌ เกิดข้อผิดพลาด', true);
             });
-        }
-
-        // ======================== UTILITY ========================
-        function esc(s) {
-            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
     </script>
 </body>
