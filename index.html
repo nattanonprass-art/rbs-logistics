@@ -814,7 +814,7 @@
                             <table class="admin-table">
                                 <thead>
                                     <tr>
-                                        <th>วันที่</th>
+                                        <th>วันที่ Submit</th>
                                         <th>เบอร์โทร</th>
                                         <th>ใบรถ</th>
                                         <th>งาน</th>
@@ -871,7 +871,7 @@
     </div>
 
     <!-- Modal -->
-    <div id="submissionModal" class="content">
+    <div id="submissionModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h3 style="margin: 0; color: #1e3a8a; font-size: 18px;">รายละเอียดการประเมิน</h3>
@@ -1387,14 +1387,16 @@
 
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
                     const timestamp = data.getValue(i, 0) || '-';
-                    const phone = data.getValue(i, 1) || '-';
+                    const phone = String(data.getValue(i, 1) || '-');
                     const truck = data.getValue(i, 2) || '-';
                     const avgScore = data.getValue(i, 16) || 0;
 
                     const key = `${timestamp}|${phone}`;
                     if (!submissions[key]) {
+                        // Ensure phone has leading 0
+                        const phoneWithZero = phone && !phone.startsWith('0') ? '0' + phone : phone;
                         submissions[key] = {
-                            timestamp, phone, truck,
+                            timestamp, phone: phoneWithZero, truck,
                             jobCount: 0,
                             scores: [],
                             firstRowIndex: i
@@ -1412,10 +1414,20 @@
                         ? (sub.scores.reduce((a, b) => a + b, 0) / sub.scores.length).toFixed(1)
                         : '-';
 
+                    // Format submit date/time (display datetime in table)
+                    let submitDateDisplay = sub.timestamp;
+                    if (sub.timestamp instanceof Date) {
+                        const d = sub.timestamp;
+                        submitDateDisplay = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`;
+                    } else if (typeof sub.timestamp === 'string') {
+                        // If it's already a formatted string from Google Apps Script, use as-is
+                        submitDateDisplay = sub.timestamp;
+                    }
+
                     const timestampEscaped = esc(sub.timestamp).replace(/'/g, "\\'");
                     const actions = `<button class="btn-small btn-primary" onclick="viewSubmission(${sub.firstRowIndex})" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmissionByTimestamp('${timestampEscaped}')">ลบ</button>`;
 
-                    rows.push(`<tr><td>${esc(sub.timestamp)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${sub.jobCount} งาน</td><td><strong>${esc(avgAll)}/10</strong></td><td>${actions}</td></tr>`);
+                    rows.push(`<tr><td>${esc(submitDateDisplay)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${sub.jobCount} งาน</td><td><strong>${esc(avgAll)}/10</strong></td><td>${actions}</td></tr>`);
                 }
 
                 tbody.innerHTML = rows.join('');
@@ -1462,10 +1474,33 @@
                 return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${esc(label)}</span><strong>${esc(v)}/10</strong></div>`;
             }).join('');
 
+            // Format dates
+            let submitDate = sub[0] || '-';
+            let installDate = sub[3] || '-';
+
+            // Helper function to format Date objects
+            const formatDateTime = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+            const formatDateOnly = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+
+            // If they're Date objects, format them
+            if (submitDate instanceof Date) {
+                submitDate = formatDateTime(submitDate);
+            }
+            if (installDate instanceof Date) {
+                installDate = formatDateOnly(installDate);
+            }
+
+            // Ensure phone has leading 0
+            let phone = sub[1] || '-';
+            if (phone !== '-' && !String(phone).startsWith('0')) {
+                phone = '0' + phone;
+            }
+
             document.getElementById('modalBody').innerHTML = `
                 <div style="margin-bottom:16px; font-size:14px; line-height:1.8;">
-                    <div><strong>วันที่:</strong> ${esc(sub[0] || '-')}</div>
-                    <div><strong>เบอร์โทร:</strong> ${esc(sub[1] || '-')}</div>
+                    <div><strong>วันที่ติดตั้ง:</strong> ${esc(installDate)}</div>
+                    <div><strong>วันที่ Submit:</strong> ${esc(submitDate)}</div>
+                    <div><strong>เบอร์โทร:</strong> ${esc(phone)}</div>
                     <div><strong>เลขรถ:</strong> ${esc(sub[2] || '-')}</div>
                     <div><strong>ชื่อช่าง:</strong> ${esc(sub[4] || '-')}</div>
                     <div><strong>ชื่อลูกค้า:</strong> ${esc(sub[5] || '-')}</div>
