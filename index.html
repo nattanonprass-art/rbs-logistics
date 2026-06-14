@@ -809,11 +809,11 @@
                     dropdown.innerHTML = '<option value="">-- เลือกงาน --</option>';
 
                     for (let i = 0; i < data.getNumberOfRows(); i++) {
-                        const jobOrder = data.getValue(i, 1) || 'ลำดับที่';
+                        const jobOrder = (i + 1); // Use row index as order number
                         const customer = data.getValue(i, 13) || 'ไม่ระบุ';
                         const option = document.createElement('option');
                         option.value = i;
-                        option.textContent = `ลำดับที่ ${jobOrder} - ลูกค้า: ${customer}`;
+                        option.textContent = `${jobOrder} - ลูกค้า: ${customer}`;
                         dropdown.appendChild(option);
                     }
 
@@ -834,12 +834,12 @@
         }
 
         function loadTruckDataFromRow(data, rowIndex) {
-            const region = data.getValue(rowIndex, 9) || '-';
-            const jobType = data.getValue(rowIndex, 10) || 'เลือกประเภทงาน';
-            const branchCode = data.getValue(rowIndex, 11) || '';
-            const customer = data.getValue(rowIndex, 13) || '';
-            const installDate = data.getValue(rowIndex, 2) || '';
-            const jobOrder = data.getValue(rowIndex, 1) || '';
+            const region = data.getValue(rowIndex, 19) || '-'; // Column T
+            const jobType = data.getValue(rowIndex, 10) || 'เลือกประเภทงาน'; // Column K
+            const branchCode = data.getValue(rowIndex, 11) || ''; // Column L
+            const customer = data.getValue(rowIndex, 13) || ''; // Column N
+            const installDate = data.getValue(rowIndex, 2) || ''; // Column C
+            const jobOrder = data.getValue(rowIndex, 1) || ''; // Column B
 
             // Set installation date from truck data
             if (installDate) {
