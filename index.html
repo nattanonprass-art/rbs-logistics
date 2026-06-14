@@ -819,7 +819,8 @@
                             <table class="admin-table">
                                 <thead>
                                     <tr>
-                                        <th>วันที่</th>
+                                        <th>วันที่ submit</th>
+                                        <th>วันที่ติดติด</th>
                                         <th>เบอร์โทร</th>
                                         <th>ใบรถ</th>
                                         <th>ชื่อ</th>
@@ -830,7 +831,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="submissionsTable">
-                                    <tr><td colspan="8" style="text-align: center; color: #6b7280; padding: 20px;">โหลดข้อมูล...</td></tr>
+                                    <tr><td colspan="9" style="text-align: center; color: #6b7280; padding: 20px;">โหลดข้อมูล...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1592,6 +1593,7 @@
                     const timestamp = data.getValue(i, 0) || '-';
                     const phone = data.getValue(i, 1) || '-';
                     const truck = data.getValue(i, 2) || '-';
+                    const installDate = data.getValue(i, 3) || '-';
                     const name = data.getValue(i, 4) || '-';
                     const customer = data.getValue(i, 5) || '-';
                     const jobType = data.getValue(i, 7) || '-';
@@ -1604,6 +1606,7 @@
                             timestamp,
                             phone,
                             truck,
+                            installDate,
                             name,
                             customer,
                             jobType,
@@ -1626,9 +1629,13 @@
                         ? (sub.scores.reduce((a, b) => a + b, 0) / sub.scores.length).toFixed(1) + '/10'
                         : '-';
 
+                    // Format dates
+                    const submitDateStr = sub.timestamp ? new Date(sub.timestamp).toLocaleString('th-TH') : '-';
+                    const installDateStr = sub.installDate ? new Date(sub.installDate).toLocaleDateString('th-TH') : '-';
+
                     const actions = `<button class="btn-small btn-primary" onclick="viewSubmission('${esc(sub.id)}')" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmission('${esc(sub.id)}')">ลบ</button>`;
 
-                    rows.push(`<tr><td>${esc(sub.timestamp)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
+                    rows.push(`<tr><td>${esc(submitDateStr)}</td><td>${esc(installDateStr)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
                 });
 
                 tbody.innerHTML = rows.join('');
@@ -1656,26 +1663,43 @@
         }
 
         function renderModal(sub) {
-            const jobs = sub.jobs || [];
-            const firstJob = jobs[0] || {};
-            const jobsHtml = jobs.length ? jobs.map((j, idx) => {
-                const scores = j.scores || {};
-                const vals = Object.values(scores);
-                const avg = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : '-';
-                const scoreRows = Object.entries(scores).map(([k, v]) => {
-                    const label = criteria.find(c => c.id === k)?.label || k;
-                    return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${esc(label)}</span><strong>${esc(v)}/10</strong></div>`;
-                }).join('');
-                return `<div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; margin-bottom:12px;"><div style="font-weight:700; color:#667eea; margin-bottom:8px;">งาน #${idx+1} [${esc(j.region || '-')}] — ${esc(j.customer || '-')} (${esc(j.type || '-')})</div><div style="font-size:13px; color:#6b7280; margin-bottom:8px;">ประเภท: ${esc(j.customerType || '-')} | สาขา: ${esc(j.location || '-')}</div>${scoreRows}<div style="display:flex; justify-content:space-between; padding-top:6px; margin-top:6px; border-top:1px dashed #e5e7eb;"><span>เฉลี่ย</span><strong>${esc(avg)}/10</strong></div>${j.comments ? `<div style="margin-top:8px; font-size:13px;">💬 ${esc(j.comments)}</div>` : ''}</div>`;
-            }).join('') : '<p>ไม่มีข้อมูล</p>';
+            // New structure: single job per row, not array
+            const scores = sub.scores || {};
+            const scoreRows = Object.entries(scores).map(([k, v]) => {
+                const label = criteria.find(c => c.id === k)?.label || k;
+                return `<div style="display:flex; justify-content:space-between; padding:4px 0;"><span style="color:#6b7280;">${esc(label)}</span><strong>${esc(v)}/10</strong></div>`;
+            }).join('');
+
+            // Format dates
+            const submitDate = sub.timestamp ? new Date(sub.timestamp).toLocaleString('th-TH') : '-';
+            const installDate = sub.installationDate ? new Date(sub.installationDate).toLocaleDateString('th-TH') : '-';
 
             document.getElementById('modalBody').innerHTML = `
-                <div style="margin-bottom:16px; font-size:14px; line-height:1.8;">
-                    <div><strong>ชื่อลูกค้า:</strong> ${esc(firstJob.customer || '-')} | <strong>ประเภท:</strong> ${esc(firstJob.customerType || '-')}</div>
-                    <div><strong>ประเภทงาน:</strong> ${esc(firstJob.type || '-')}</div>
-                    <div><strong>รหัสสาขา:</strong> ${esc(firstJob.location || '-')} | <strong>เพิ่มภาค:</strong> ${esc(firstJob.region || '-')}</div>
+                <div style="margin-bottom:16px; font-size:13px; line-height:1.8;">
+                    <div><strong>วันที่ submit:</strong> ${esc(submitDate)}</div>
+                    <div><strong>วันที่ติดตั้ง:</strong> ${esc(installDate)}</div>
+                    <div><strong>ชื่อช่างติดตั้ง:</strong> ${esc(sub.name || '-')}</div>
+                    <div><strong>เบอร์โทร:</strong> ${esc(sub.phone || '-')}</div>
+                    <div><strong>ใบรถ:</strong> ${esc(sub.truckNumber || '-')}</div>
                 </div>
-                ${jobsHtml}
+                <div style="border-top:1px solid #e5e7eb; padding-top:12px; margin-bottom:12px;">
+                    <div style="font-weight:700; color:#667eea; margin-bottom:8px;">ข้อมูลงาน</div>
+                    <div style="font-size:13px; line-height:1.8;">
+                        <div><strong>ชื่อลูกค้า:</strong> ${esc(sub.customer || '-')}</div>
+                        <div><strong>ประเภทลูกค้า:</strong> ${esc(sub.customerType || '-')}</div>
+                        <div><strong>ประเภทงาน:</strong> ${esc(sub.type || '-')}</div>
+                        <div><strong>รหัสสาขา:</strong> ${esc(sub.location || '-')}</div>
+                        <div><strong>ภาค:</strong> ${esc(sub.region || '-')}</div>
+                    </div>
+                </div>
+                <div style="border-top:1px solid #e5e7eb; padding-top:12px; margin-bottom:12px;">
+                    <div style="font-weight:700; color:#667eea; margin-bottom:8px;">การประเมิน</div>
+                    <div style="font-size:13px;">
+                        ${scoreRows}
+                        <div style="display:flex; justify-content:space-between; padding-top:6px; margin-top:6px; border-top:1px dashed #e5e7eb;"><span><strong>เฉลี่ย</strong></span><strong>${esc(sub.avgScore || '-')}/10</strong></div>
+                    </div>
+                </div>
+                ${sub.comments ? `<div style="background:#f9fafb; padding:10px; border-radius:6px; font-size:13px;">💬 <strong>ความเห็น:</strong> ${esc(sub.comments)}</div>` : ''}
             `;
         }
 
