@@ -822,13 +822,15 @@
                                         <th>วันที่</th>
                                         <th>เบอร์โทร</th>
                                         <th>ใบรถ</th>
-                                        <th>งาน</th>
+                                        <th>ชื่อ</th>
+                                        <th>ลูกค้า</th>
+                                        <th>จำนวนงาน</th>
                                         <th>เฉลี่ย</th>
                                         <th>ดำเนินการ</th>
                                     </tr>
                                 </thead>
                                 <tbody id="submissionsTable">
-                                    <tr><td colspan="6" style="text-align: center; color: #6b7280; padding: 20px;">โหลดข้อมูล...</td></tr>
+                                    <tr><td colspan="8" style="text-align: center; color: #6b7280; padding: 20px;">โหลดข้อมูล...</td></tr>
                                 </tbody>
                             </table>
                         </div>
@@ -1564,7 +1566,7 @@
 
         function loadSubmissions() {
             const tbody = document.getElementById('submissionsTable');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">กำลังโหลด...</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">กำลังโหลด...</td></tr>';
 
             const query = new google.visualization.Query(
                 `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0&_=${Date.now()}`
@@ -1572,53 +1574,62 @@
 
             query.send(resp => {
                 if (resp.isError()) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">❌ ไม่สามารถโหลด</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">❌ ไม่สามารถโหลด</td></tr>';
                     return;
                 }
 
                 const data = resp.getDataTable();
                 if (data.getNumberOfRows() === 0) {
-                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">ไม่มีข้อมูล</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">ไม่มีข้อมูล</td></tr>';
                     return;
                 }
 
-                const rows = [];
+                // Group by (timestamp, phone, truck) to count jobs per submission
+                const submissions = {};
+                const rowList = [];
+
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
                     const timestamp = data.getValue(i, 0) || '-';
                     const phone = data.getValue(i, 1) || '-';
                     const truck = data.getValue(i, 2) || '-';
-                    const jobsInfo = data.getValue(i, 3) || '-';
-                    const id = data.getNumberOfColumns() > 4 ? data.getValue(i, 4) : '';
+                    const name = data.getValue(i, 4) || '-';
+                    const customer = data.getValue(i, 5) || '-';
+                    const jobType = data.getValue(i, 7) || '-';
+                    const avgScore = data.getValue(i, 16) || '-';
 
-                    let avgDisplay = '-';
-                    let jobCount = jobsInfo !== '-' ? jobsInfo.split(';').length : 0;
+                    const key = `${timestamp}|${phone}|${truck}`;
 
-                    if (data.getNumberOfColumns() > 5) {
-                        const blob = data.getValue(i, 5);
-                        if (blob) {
-                            try {
-                                const parsed = JSON.parse(blob);
-                                const jobs = parsed.jobs || [];
-                                if (jobs.length) jobCount = jobs.length;
-                                let total = 0, count = 0;
-                                jobs.forEach(j => {
-                                    const scores = Object.values(j.scores || {});
-                                    if (scores.length) {
-                                        total += scores.reduce((a, b) => a + Number(b), 0) / scores.length;
-                                        count++;
-                                    }
-                                });
-                                if (count > 0) avgDisplay = (total / count).toFixed(1) + '/10';
-                            } catch (e) {
-                                console.log('Parse error');
-                            }
-                        }
+                    if (!submissions[key]) {
+                        submissions[key] = {
+                            timestamp,
+                            phone,
+                            truck,
+                            name,
+                            customer,
+                            jobType,
+                            jobCount: 0,
+                            scores: [],
+                            id: `${timestamp}-${phone}`
+                        };
                     }
 
-                    const actions = id ? `<button class="btn-small btn-primary" onclick="viewSubmission('${esc(id)}')" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmission('${esc(id)}')">ลบ</button>` : '<button class="btn-small btn-secondary" disabled>อ่าน</button>';
-
-                    rows.push(`<tr><td>${esc(timestamp)}</td><td>${esc(phone)}</td><td>${esc(truck)}</td><td>${jobCount} งาน</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
+                    submissions[key].jobCount++;
+                    if (avgScore !== '-') {
+                        submissions[key].scores.push(Number(avgScore));
+                    }
                 }
+
+                // Convert to rows
+                const rows = [];
+                Object.values(submissions).forEach(sub => {
+                    const avgDisplay = sub.scores.length > 0
+                        ? (sub.scores.reduce((a, b) => a + b, 0) / sub.scores.length).toFixed(1) + '/10'
+                        : '-';
+
+                    const actions = `<button class="btn-small btn-primary" onclick="viewSubmission('${esc(sub.id)}')" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmission('${esc(sub.id)}')">ลบ</button>`;
+
+                    rows.push(`<tr><td>${esc(sub.timestamp)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
+                });
 
                 tbody.innerHTML = rows.join('');
             });
