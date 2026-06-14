@@ -760,6 +760,11 @@
             document.getElementById('adminPage').classList.remove('active');
             document.getElementById(page).classList.add('active');
             document.body.classList.toggle('login-mode', page === 'loginPage');
+
+            // Initialize form with default empty job card when showing technician page
+            if (page === 'technicianPage' && document.getElementById('jobsContainer').innerHTML === '') {
+                addJob();
+            }
         }
 
         function showLoginMsg(msg, isError) {
