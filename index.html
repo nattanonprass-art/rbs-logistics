@@ -592,10 +592,11 @@
             background: #fff;
             border-radius: 12px;
             max-width: 600px;
-            width: 100%;
+            width: 90%;
             max-height: 85vh;
             overflow: auto;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            margin: auto;
         }
 
         .modal-header {
@@ -823,13 +824,13 @@
                                 <thead>
                                     <tr>
                                         <th>วันที่ติดติด</th>
+                                        <th>วันที่ submit</th>
                                         <th>เบอร์โทร</th>
                                         <th>ใบรถ</th>
                                         <th>ชื่อ</th>
                                         <th>ลูกค้า</th>
                                         <th>จำนวนงาน</th>
                                         <th>เฉลี่ย</th>
-                                        <th>วันที่ submit</th>
                                         <th>ดำเนินการ</th>
                                     </tr>
                                 </thead>
@@ -1641,9 +1642,15 @@
                     const submitDateStr = sub.timestamp ? new Date(sub.timestamp).toLocaleString('th-TH') : '-';
                     const installDateStr = sub.installDate ? new Date(sub.installDate).toLocaleDateString('th-TH') : '-';
 
+                    // Ensure phone has 0 prefix
+                    let phoneDisplay = String(sub.phone || '');
+                    if (phoneDisplay && !phoneDisplay.startsWith('0')) {
+                        phoneDisplay = '0' + phoneDisplay;
+                    }
+
                     const actions = `<button class="btn-small btn-primary" onclick="viewSubmission('${esc(sub.id)}')" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmission('${esc(sub.id)}')">ลบ</button>`;
 
-                    rows.push(`<tr><td>${esc(installDateStr)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${esc(submitDateStr)}</td><td>${actions}</td></tr>`);
+                    rows.push(`<tr><td>${esc(installDateStr)}</td><td>${esc(submitDateStr)}</td><td>${esc(phoneDisplay)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
                 });
 
                 tbody.innerHTML = rows.join('');
@@ -1682,12 +1689,18 @@
             const submitDate = sub.timestamp ? new Date(sub.timestamp).toLocaleString('th-TH') : '-';
             const installDate = sub.installationDate ? new Date(sub.installationDate).toLocaleDateString('th-TH') : '-';
 
+            // Ensure phone has 0 prefix
+            let phone = String(sub.phone || '');
+            if (phone && !phone.startsWith('0')) {
+                phone = '0' + phone;
+            }
+
             document.getElementById('modalBody').innerHTML = `
                 <div style="margin-bottom:16px; font-size:13px; line-height:1.8;">
-                    <div><strong>วันที่ submit:</strong> ${esc(submitDate)}</div>
                     <div><strong>วันที่ติดตั้ง:</strong> ${esc(installDate)}</div>
+                    <div><strong>วันที่ submit:</strong> ${esc(submitDate)}</div>
                     <div><strong>ชื่อช่างติดตั้ง:</strong> ${esc(sub.name || '-')}</div>
-                    <div><strong>เบอร์โทร:</strong> ${esc(sub.phone || '-')}</div>
+                    <div><strong>เบอร์โทร:</strong> ${esc(phone)}</div>
                     <div><strong>ใบรถ:</strong> ${esc(sub.truckNumber || '-')}</div>
                 </div>
                 <div style="border-top:1px solid #e5e7eb; padding-top:12px; margin-bottom:12px;">
