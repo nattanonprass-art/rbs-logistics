@@ -808,7 +808,7 @@
                     loadTruckDataFromRow(data, 0);
                     document.getElementById('truckSelectionDiv').style.display = 'none';
                 } else {
-                    // Multiple jobs - show dropdown
+                    // Multiple jobs - show dropdown and load first job
                     document.getElementById('truckSelectionDiv').style.display = 'block';
                     const dropdown = document.getElementById('truckSelectionDropdown');
                     dropdown.innerHTML = '<option value="">-- เลือกงาน --</option>';
@@ -823,6 +823,9 @@
                     }
 
                     selectedTruckData = data;
+                    // Auto-load first job
+                    selectedJobIndex = 0;
+                    loadTruckDataFromRow(data, 0);
                 }
             });
         }
