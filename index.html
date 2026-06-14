@@ -546,7 +546,7 @@
                         </div>
                         <div class="form-group">
                             <label>วันที่ติดตั้ง *</label>
-                            <input type="date" id="installationDate" required>
+                            <input type="text" id="installationDate" placeholder="dd/mm/yyyy" required>
                         </div>
                     </div>
 
@@ -854,25 +854,28 @@
                 let dateStr = '';
                 try {
                     if (installDate instanceof Date && !isNaN(installDate.getTime())) {
-                        // Date object from Google Sheets - convert to yyyy-MM-dd for input[type=date]
+                        // Date object from Google Sheets - convert to dd/mm/yyyy for display
                         const d = String(installDate.getDate()).padStart(2, '0');
                         const m = String(installDate.getMonth() + 1).padStart(2, '0');
                         const y = installDate.getFullYear();
-                        dateStr = `${y}-${m}-${d}`;
+                        dateStr = `${d}/${m}/${y}`;
                     } else if (typeof installDate === 'string' && installDate.trim()) {
-                        // String format - convert from yyyy/mm/dd to yyyy-MM-dd
+                        // String format - convert from yyyy/mm/dd to dd/mm/yyyy
                         const strValue = installDate.trim();
 
                         // Try yyyy/mm/dd format (from Google Sheets)
                         if (strValue.includes('/')) {
                             const parts = strValue.split('/');
                             if (parts.length === 3 && parts[0].length === 4) {
-                                // yyyy/mm/dd format - convert to yyyy-MM-dd
-                                dateStr = `${parts[0]}-${parts[1]}-${parts[2]}`;
+                                // yyyy/mm/dd format - convert to dd/mm/yyyy
+                                dateStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
                             }
                         } else if (strValue.includes('-')) {
-                            // Already in yyyy-mm-dd or similar format
-                            dateStr = strValue;
+                            // Try yyyy-mm-dd format
+                            const parts = strValue.split('-');
+                            if (parts.length === 3 && parts[0].length === 4) {
+                                dateStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                            }
                         }
                     } else if (typeof installDate === 'number') {
                         // Google Sheets serial date format
@@ -881,7 +884,7 @@
                         const d = String(resultDate.getDate()).padStart(2, '0');
                         const m = String(resultDate.getMonth() + 1).padStart(2, '0');
                         const y = resultDate.getFullYear();
-                        dateStr = `${y}-${m}-${d}`;
+                        dateStr = `${d}/${m}/${y}`;
                     }
                 } catch (e) {
                     console.warn('Error parsing installation date:', installDate, e);
