@@ -819,8 +819,8 @@
                             <table class="admin-table">
                                 <thead>
                                     <tr>
-                                        <th>วันที่ submit</th>
                                         <th>วันที่ติดติด</th>
+                                        <th>วันที่ submit</th>
                                         <th>เบอร์โทร</th>
                                         <th>ใบรถ</th>
                                         <th>ชื่อ</th>
@@ -881,7 +881,7 @@
     <script src="https://www.gstatic.com/charts/loader.js"></script>
     <script>
         // ======================== CONFIG ========================
-        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyQSei48fAbwlT9xhByiCo4fGq0KRPXqEtl3YAv1ageg37iaa2AgoNTxyfJthFTHdI/exec';
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbw9Q9E2s1etiBtf78A3UqlrkHk_iRczpIU11fBauzLzAJsa5R2Zlhzmhiw13bzG23c/exec';
         const SHEET_ID = '1HkcfuUZ27AWZXi8OBXoEW7C5n1dInFMWsSTSCCCxhng';
         const TRUCK_SHEET_ID = '1jgQkZDJKF7T45DnDeaYQN5yOsperj9eRoB8UdzndiJs';
         const USERS_GID = '2094571933';
@@ -1011,10 +1011,15 @@
         }
 
         function loginAsUser() {
-            const phone = document.getElementById('loginPhone').value.trim();
+            let phone = document.getElementById('loginPhone').value.trim();
             if (!phone) {
                 showMsg('loginMsg', 'กรุณากรอกเบอร์โทร', true);
                 return;
+            }
+
+            // Auto-add 0 prefix if missing
+            if (!phone.startsWith('0')) {
+                phone = '0' + phone;
             }
 
             if (!chartsLoaded) {
@@ -1612,7 +1617,7 @@
                             jobType,
                             jobCount: 0,
                             scores: [],
-                            id: `${timestamp}-${phone}`
+                            id: phone  // Use phone as unique ID
                         };
                     }
 
@@ -1635,7 +1640,7 @@
 
                     const actions = `<button class="btn-small btn-primary" onclick="viewSubmission('${esc(sub.id)}')" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmission('${esc(sub.id)}')">ลบ</button>`;
 
-                    rows.push(`<tr><td>${esc(submitDateStr)}</td><td>${esc(installDateStr)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
+                    rows.push(`<tr><td>${esc(installDateStr)}</td><td>${esc(submitDateStr)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
                 });
 
                 tbody.innerHTML = rows.join('');
@@ -1775,12 +1780,17 @@
         }
 
         function addUser() {
-            const phone = document.getElementById('newUserPhone').value.trim();
+            let phone = document.getElementById('newUserPhone').value.trim();
             const name = document.getElementById('newUserName').value.trim();
 
             if (!phone) {
                 showMsg('usersMsg', 'กรุณากรอกเบอร์โทร', true);
                 return;
+            }
+
+            // Auto-add 0 prefix if missing
+            if (!phone.startsWith('0')) {
+                phone = '0' + phone;
             }
 
             fetch(GOOGLE_APPS_SCRIPT_URL, {
