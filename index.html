@@ -1438,7 +1438,7 @@
                     const timestampEscaped = esc(sub.timestamp).replace(/'/g, "\\'");
                     const actions = `<button class="btn-small btn-primary" onclick="viewSubmission(${sub.firstRowIndex})" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmissionByTimestamp('${timestampEscaped}')">ลบ</button>`;
 
-                    rows.push(`<tr><td>${esc(installDateDisplay)}</td><td>${esc(submitDateDisplay)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount} งาน</td><td><strong>${esc(avgAll)}/10</strong></td><td>${actions}</td></tr>`);
+                    rows.push(`<tr><td>${esc(installDateDisplay)}</td><td>${esc(submitDateDisplay)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgAll)}/10</strong></td><td>${actions}</td></tr>`);
                 }
 
                 tbody.innerHTML = rows.join('');
@@ -1509,7 +1509,7 @@
 
             document.getElementById('modalBody').innerHTML = `
                 <!-- ข้อมูลทั่วไป -->
-                <div style="margin-bottom:20px; font-size:14px; line-height:1.9;">
+                <div style="margin-bottom:20px; font-size:13px; line-height:1.9;">
                     <div style="margin-bottom:6px;"><strong>วันที่ติดตั้ง:</strong> ${esc(installDate)}</div>
                     <div style="margin-bottom:6px;"><strong>วันที่ submit:</strong> ${esc(submitDate)}</div>
                     <div style="margin-bottom:6px;"><strong>ชื่อช่างติดตั้ง:</strong> ${esc(sub[4] || '-')}</div>
@@ -1520,7 +1520,7 @@
                 <!-- ข้อมูลลูกค้า -->
                 <div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-bottom:20px;">
                     <div style="font-weight:700; color:#667eea; margin-bottom:12px; font-size:13px;">ข้อมูลลูกค้า</div>
-                    <div style="font-size:14px; line-height:1.9;">
+                    <div style="font-size:13px; line-height:1.9;">
                         <div style="margin-bottom:6px;"><strong>ชื่อลูกค้า:</strong> ${esc(sub[5] || '-')}</div>
                         <div style="margin-bottom:6px;"><strong>ประเภทลูกค้า:</strong> ${esc(sub[6] || '-')}</div>
                         <div style="margin-bottom:6px;"><strong>ประเภทงาน:</strong> ${esc(sub[7] || '-')}</div>
@@ -1532,13 +1532,13 @@
                 <!-- การประเมิน -->
                 <div style="border-top:1px solid #e5e7eb; padding-top:16px;">
                     <div style="font-weight:700; color:#667eea; margin-bottom:12px; font-size:13px;">การประเมิน</div>
-                    <div style="font-size:14px; line-height:2;">
+                    <div style="font-size:13px; line-height:2;">
                         ${scoreRows}
                     </div>
-                    <div style="display:flex; justify-content:space-between; padding-top:12px; margin-top:12px; border-top:1px dashed #e5e7eb; font-weight:700; font-size:15px;"><span>เฉลี่ย</span><strong>${esc(sub[16] || '-')}/10</strong></div>
+                    <div style="display:flex; justify-content:space-between; padding-top:12px; margin-top:12px; border-top:1px dashed #e5e7eb; font-weight:700; font-size:13px;"><span>เฉลี่ย</span><strong>${esc(sub[16] || '-')}/10</strong></div>
                 </div>
 
-                ${sub[15] ? `<div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px; font-size:13px;"><strong>ความเห็น:</strong> ${esc(sub[15])}</div>` : ''}
+                ${sub[15] ? `<div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px; font-size:13px;"><strong>💬 ความเห็น:</strong> ${esc(sub[15])}</div>` : ''}
             `;
         }
 
