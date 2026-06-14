@@ -855,7 +855,8 @@
                 if (installDate instanceof Date) {
                     dateStr = installDate.toISOString().split('T')[0];
                 } else if (typeof installDate === 'string' && installDate.trim()) {
-                    dateStr = installDate.trim();
+                    // Convert from yyyy/mm/dd to yyyy-mm-dd format
+                    dateStr = installDate.trim().replace(/\//g, '-');
                 } else if (typeof installDate === 'number') {
                     // Handle Google Sheets serial date format
                     const baseDate = new Date(1899, 11, 30);
