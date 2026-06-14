@@ -1077,7 +1077,7 @@
                 }
 
                 const query = new google.visualization.Query(
-                    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0&tq=SELECT K`
+                    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0&tq=SELECT H`
                 );
 
                 query.send(resp => {
@@ -1231,6 +1231,10 @@
                     <label>รหัสสาขา</label>
                     <input type="text" name="job${jobCount}_location" placeholder="เช่น BKK01">
                 </div>
+                <div class="form-group">
+                    <label>ภาค</label>
+                    <input type="text" name="job${jobCount}_region" placeholder="เช่น กทม.">
+                </div>
                 <div class="rating-section">
                     <h4 style="color: #1e3a8a; margin-bottom: 15px;">⭐ ประเมินคุณภาพงาน</h4>
                     ${scoresHtml}
@@ -1297,6 +1301,7 @@
                     customer: customer,
                     type: type,
                     location: card.querySelector('input[name*="_location"]').value,
+                    region: card.querySelector('input[name*="_region"]').value || '',
                     scores: Object.fromEntries(criteria.map(c => [c.id, parseInt(card.querySelector(`input[name*="_${c.id}"]`).value)])),
                     comments: card.querySelector('textarea[name*="_comments"]').value
                 });
@@ -1376,42 +1381,41 @@
                     return;
                 }
 
-                const rows = [];
+                // Group rows by timestamp+phone (1 submission = multiple jobs)
+                const submissions = {};
+                const rowIndices = {}; // Store first row index for each submission
+
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
                     const timestamp = data.getValue(i, 0) || '-';
                     const phone = data.getValue(i, 1) || '-';
                     const truck = data.getValue(i, 2) || '-';
-                    const jobsInfo = data.getValue(i, 3) || '-';
-                    const id = data.getNumberOfColumns() > 4 ? data.getValue(i, 4) : '';
+                    const avgScore = data.getValue(i, 16) || 0;
 
-                    let avgDisplay = '-';
-                    let jobCount = jobsInfo !== '-' ? jobsInfo.split(';').length : 0;
-
-                    if (data.getNumberOfColumns() > 5) {
-                        const blob = data.getValue(i, 5);
-                        if (blob) {
-                            try {
-                                const parsed = JSON.parse(blob);
-                                const jobs = parsed.jobs || [];
-                                if (jobs.length) jobCount = jobs.length;
-                                let total = 0, count = 0;
-                                jobs.forEach(j => {
-                                    const scores = Object.values(j.scores || {});
-                                    if (scores.length) {
-                                        total += scores.reduce((a, b) => a + Number(b), 0) / scores.length;
-                                        count++;
-                                    }
-                                });
-                                if (count > 0) avgDisplay = (total / count).toFixed(1) + '/10';
-                            } catch (e) {
-                                console.log('Parse error');
-                            }
-                        }
+                    const key = `${timestamp}|${phone}`;
+                    if (!submissions[key]) {
+                        submissions[key] = {
+                            timestamp, phone, truck,
+                            jobCount: 0,
+                            scores: [],
+                            firstRowIndex: i
+                        };
+                        rowIndices[key] = i;
                     }
+                    submissions[key].jobCount++;
+                    submissions[key].scores.push(Number(avgScore));
+                }
 
-                    const actions = id ? `<button class="btn-small btn-primary" onclick="viewSubmission('${esc(id)}')" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmission('${esc(id)}')">ลบ</button>` : '<button class="btn-small btn-secondary" disabled>อ่าน</button>';
+                const rows = [];
+                for (const key in submissions) {
+                    const sub = submissions[key];
+                    const avgAll = sub.scores.length > 0
+                        ? (sub.scores.reduce((a, b) => a + b, 0) / sub.scores.length).toFixed(1)
+                        : '-';
 
-                    rows.push(`<tr><td>${esc(timestamp)}</td><td>${esc(phone)}</td><td>${esc(truck)}</td><td>${jobCount} งาน</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
+                    const timestampEscaped = esc(sub.timestamp).replace(/'/g, "\\'");
+                    const actions = `<button class="btn-small btn-primary" onclick="viewSubmission(${sub.firstRowIndex})" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmissionByTimestamp('${timestampEscaped}')">ลบ</button>`;
+
+                    rows.push(`<tr><td>${esc(sub.timestamp)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${sub.jobCount} งาน</td><td><strong>${esc(avgAll)}/10</strong></td><td>${actions}</td></tr>`);
                 }
 
                 tbody.innerHTML = rows.join('');
@@ -1483,17 +1487,18 @@
             document.getElementById('submissionModal').classList.remove('active');
         }
 
-        function deleteSubmission(id) {
+        function deleteSubmissionByTimestamp(timestamp) {
             if (!confirm('ต้องการลบ?')) return;
 
             fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'deleteSubmissionFromSheet', token: adminToken, id: id })
+                body: JSON.stringify({ action: 'deleteSubmissionFromSheet', token: adminToken, timestamp: timestamp })
             })
             .then(r => r.json())
             .then(data => {
                 if (data.success) {
                     showMsg('submissionsMsg', '✅ ลบสำเร็จ', false);
+                    closeModal();
                     loadSubmissions();
                 } else {
                     showMsg('submissionsMsg', '❌ ลบไม่สำเร็จ', true);
@@ -1503,6 +1508,11 @@
                 console.error(err);
                 showMsg('submissionsMsg', '❌ เกิดข้อผิดพลาด', true);
             });
+        }
+
+        function deleteSubmission(id) {
+            // Legacy function - kept for compatibility
+            console.warn('deleteSubmission is deprecated, use deleteSubmissionByTimestamp instead');
         }
 
         function exportCSV() {
@@ -1517,28 +1527,28 @@
                 }
 
                 const data = resp.getDataTable();
-                let csv = 'ลำดับ,วันที่,เบอร์โทร,ชื่อ,ใบรถ,งาน,ลูกค้า,ประเภท,สาขา,ความถูกต้อง,ความตรงเวลา,ความเป็นมืออาชีพ,ความสะอาด,การสื่อสาร,เฉลี่ย,ความเห็น\n';
+                let csv = 'ลำดับ,วันที่,เบอร์โทร,เลขรถ,วันที่ติดตั้ง,ชื่อ,ลูกค้า,ประเภทลูกค้า,ประเภทงาน,สถานที่,ภาค,ความถูกต้อง,ความตรงเวลา,ความเป็นมืออาชีพ,ความสะอาด,การสื่อสาร,ความเห็น,เฉลี่ย\n';
 
                 for (let i = 0; i < data.getNumberOfRows(); i++) {
                     const timestamp = data.getValue(i, 0) || '-';
                     const phone = data.getValue(i, 1) || '-';
                     const truck = data.getValue(i, 2) || '-';
-                    const blob = data.getValue(i, 5);
+                    const installDate = data.getValue(i, 3) || '-';
+                    const name = data.getValue(i, 4) || '-';
+                    const customer = data.getValue(i, 5) || '-';
+                    const custType = data.getValue(i, 6) || '-';
+                    const jobType = data.getValue(i, 7) || '-';
+                    const location = data.getValue(i, 8) || '-';
+                    const region = data.getValue(i, 9) || '-';
+                    const accuracy = data.getValue(i, 10) || '-';
+                    const timeliness = data.getValue(i, 11) || '-';
+                    const professionalism = data.getValue(i, 12) || '-';
+                    const cleanliness = data.getValue(i, 13) || '-';
+                    const communication = data.getValue(i, 14) || '-';
+                    const comments = data.getValue(i, 15) || '-';
+                    const avgScore = data.getValue(i, 16) || '-';
 
-                    if (blob) {
-                        try {
-                            const parsed = JSON.parse(blob);
-                            const name = parsed.name || '-';
-                            parsed.jobs.forEach((j, idx) => {
-                                const scores = j.scores || {};
-                                const vals = Object.values(scores);
-                                const avg = vals.length ? (vals.reduce((a, b) => a + b) / vals.length).toFixed(1) : '-';
-                                csv += `"${i+1}","${timestamp}","${phone}","${name}","${truck}","${idx+1}","${j.customer}","${j.type}","${j.location}","${scores.accuracy}","${scores.timeliness}","${scores.professionalism}","${scores.cleanliness}","${scores.communication}","${avg}","${j.comments}"\n`;
-                            });
-                        } catch (e) {
-                            console.log('Parse error');
-                        }
-                    }
+                    csv += `"${i+1}","${timestamp}","${phone}","${truck}","${installDate}","${name}","${customer}","${custType}","${jobType}","${location}","${region}","${accuracy}","${timeliness}","${professionalism}","${cleanliness}","${communication}","${comments}","${avgScore}"\n`;
                 }
 
                 const BOM = '﻿';
