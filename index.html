@@ -1418,47 +1418,64 @@
             });
         }
 
-        function viewSubmission(id) {
-            fetch(GOOGLE_APPS_SCRIPT_URL, {
-                method: 'POST',
-                body: JSON.stringify({ action: 'getSubmissionDetail', token: adminToken, id: id })
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success && data.submission) {
-                    renderModal(data.submission);
+        function viewSubmission(rowIndex) {
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0`
+            );
+
+            query.send(resp => {
+                if (resp.isError()) {
+                    showMsg('submissionsMsg', '❌ ไม่สามารถโหลด', true);
+                    return;
+                }
+
+                const data = resp.getDataTable();
+                if (rowIndex < data.getNumberOfRows()) {
+                    const row = [];
+                    for (let i = 0; i < data.getNumberOfColumns(); i++) {
+                        row.push(data.getValue(rowIndex, i));
+                    }
+                    renderModal(row);
                     document.getElementById('submissionModal').classList.add('active');
                 } else {
                     showMsg('submissionsMsg', '❌ ไม่พบข้อมูล', true);
                 }
-            })
-            .catch(err => {
-                console.error(err);
-                showMsg('submissionsMsg', '❌ ไม่สามารถโหลด', true);
             });
         }
 
         function renderModal(sub) {
-            const jobs = sub.jobs || [];
-            const firstJob = jobs[0] || {};
-            const jobsHtml = jobs.length ? jobs.map((j, idx) => {
-                const scores = j.scores || {};
-                const vals = Object.values(scores);
-                const avg = vals.length ? (vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(1) : '-';
-                const scoreRows = Object.entries(scores).map(([k, v]) => {
-                    const label = criteria.find(c => c.id === k)?.label || k;
-                    return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${esc(label)}</span><strong>${esc(v)}/10</strong></div>`;
-                }).join('');
-                return `<div style="border:1px solid #e5e7eb; border-radius:8px; padding:14px; margin-bottom:12px;"><div style="font-weight:700; color:#667eea; margin-bottom:8px;">งาน #${idx+1} — ${esc(j.customer || '-')} (${esc(j.type || '-')})</div><div style="font-size:13px; color:#6b7280; margin-bottom:8px;">สาขา: ${esc(j.location || '-')}</div>${scoreRows}<div style="display:flex; justify-content:space-between; padding-top:6px; margin-top:6px; border-top:1px dashed #e5e7eb;"><span>เฉลี่ย</span><strong>${esc(avg)}/10</strong></div>${j.comments ? `<div style="margin-top:8px; font-size:13px;">💬 ${esc(j.comments)}</div>` : ''}</div>`;
-            }).join('') : '<p>ไม่มีข้อมูล</p>';
+            const keys = ['Timestamp', 'Phone', 'Truck', 'InstDate', 'Name', 'Customer', 'CustType', 'JobType', 'Location', 'Region', 'Accuracy', 'Timeliness', 'Professionalism', 'Cleanliness', 'Communication', 'Comments', 'AvgScore'];
+            
+            const scores = {
+                accuracy: sub[10] || '-',
+                timeliness: sub[11] || '-',
+                professionalism: sub[12] || '-',
+                cleanliness: sub[13] || '-',
+                communication: sub[14] || '-'
+            };
+            const scoreRows = Object.entries(scores).map(([k, v]) => {
+                const label = criteria.find(c => c.id === k)?.label || k;
+                return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${esc(label)}</span><strong>${esc(v)}/10</strong></div>`;
+            }).join('');
 
             document.getElementById('modalBody').innerHTML = `
                 <div style="margin-bottom:16px; font-size:14px; line-height:1.8;">
-                    <div><strong>ชื่อลูกค้า:</strong> ${esc(firstJob.customer || '-')}</div>
-                    <div><strong>ประเภทงาน:</strong> ${esc(firstJob.type || '-')}</div>
-                    <div><strong>รหัสสาขา:</strong> ${esc(firstJob.location || '-')}</div>
+                    <div><strong>วันที่:</strong> ${esc(sub[0] || '-')}</div>
+                    <div><strong>เบอร์โทร:</strong> ${esc(sub[1] || '-')}</div>
+                    <div><strong>เลขรถ:</strong> ${esc(sub[2] || '-')}</div>
+                    <div><strong>ชื่อช่าง:</strong> ${esc(sub[4] || '-')}</div>
+                    <div><strong>ชื่อลูกค้า:</strong> ${esc(sub[5] || '-')}</div>
+                    <div><strong>ประเภทลูกค้า:</strong> ${esc(sub[6] || '-')}</div>
+                    <div><strong>ประเภทงาน:</strong> ${esc(sub[7] || '-')}</div>
+                    <div><strong>สถานที่:</strong> ${esc(sub[8] || '-')}</div>
+                    <div><strong>ภาค:</strong> ${esc(sub[9] || '-')}</div>
                 </div>
-                ${jobsHtml}
+                <div style="border-top:1px solid #e5e7eb; padding-top:16px;">
+                    <div style="font-weight:700; color:#667eea; margin-bottom:12px;">⭐ คะแนนประเมิน</div>
+                    ${scoreRows}
+                    <div style="display:flex; justify-content:space-between; padding-top:12px; margin-top:12px; border-top:1px dashed #e5e7eb;"><span>เฉลี่ย</span><strong>${esc(sub[16] || '-')}/10</strong></div>
+                    ${sub[15] ? `<div style="margin-top:12px; font-size:13px;">💬 ${esc(sub[15])}</div>` : ''}
+                </div>
             `;
         }
 
