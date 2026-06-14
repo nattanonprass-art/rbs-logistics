@@ -1045,20 +1045,20 @@
                         if (idx === cards.length - 1) {
                             showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
                             setTimeout(() => {
-                                document.getElementById('evaluationForm').reset();
+                                // Clear only job cards, keep truck number and installation date
                                 document.getElementById('jobsContainer').innerHTML = '';
-                                document.getElementById('truckNumber').value = '';
-                                document.getElementById('installationDate').value = '';
                                 document.getElementById('truckSelectionDiv').style.display = 'none';
                                 jobCount = 0;
+                                addJob(); // Add fresh job card
                             }, 2000);
                         }
                     } else {
-                        showMsg('formMsg', '❌ ส่งไม่สำเร็จ', true);
+                        console.error('API Error:', res);
+                        showMsg('formMsg', '❌ ส่งไม่สำเร็จ: ' + (res.error || 'Unknown error'), true);
                     }
                 })
                 .catch(err => {
-                    console.error(err);
+                    console.error('Fetch Error:', err);
                     showMsg('formMsg', '❌ เกิดข้อผิดพลาด', true);
                 });
             }
