@@ -88,7 +88,7 @@
             width: 100%;
             max-width: 880px;
             display: grid;
-            grid-template-columns: minmax(0, 380px) 1fr;
+            grid-template-columns: minmax(0, 380px) 1px minmax(0, 380px);
             gap: 36px;
             background: rgba(255, 255, 255, 0.10);
             border: 1px solid rgba(255, 255, 255, 0.28);
@@ -101,6 +101,24 @@
             .login-wrapper {
                 grid-template-columns: 1fr;
                 max-width: 400px;
+            }
+        }
+
+        .login-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .login-divider {
+            display: none;
+            border-left: 1px solid rgba(255,255,255,0.2);
+            margin: 0;
+        }
+
+        @media (min-width: 901px) {
+            .login-divider {
+                display: block;
             }
         }
 
@@ -487,24 +505,25 @@
                     </div>
                     <h1 class="login-brand">RBS Logistics</h1>
                     <p class="login-subtitle">ระบบประเมินการติดตั้ง Shelf</p>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 16px;">👨‍🔧 สำหรับช่าง</p>
 
                     <div class="message" id="loginMsg"></div>
 
                     <div class="login-field">
                         <input type="tel" id="loginPhone" placeholder="เบอร์โทรศัพท์" onkeypress="if(event.key==='Enter')loginAsUser()">
                     </div>
-                    <button class="login-submit-btn" onclick="loginAsUser()">👨‍🔧 LOGIN</button>
+                    <button class="login-submit-btn" onclick="loginAsUser()">LOGIN</button>
                 </div>
 
                 <div style="text-align: center; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 36px;">
-                    <h2 style="font-size: 18px; margin-bottom: 20px;">🔐 Admin</h2>
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">🔐 สำหรับแอดมิน</p>
                     <div class="login-field">
                         <input type="text" id="adminId" placeholder="Admin ID" onkeypress="if(event.key==='Enter')loginAsAdmin()">
                     </div>
                     <div class="login-field">
                         <input type="password" id="adminPassword" placeholder="Password" onkeypress="if(event.key==='Enter')loginAsAdmin()">
                     </div>
-                    <button class="login-submit-btn" style="background: #10b981;" onclick="loginAsAdmin()">🔓 LOGIN</button>
+                    <button class="login-submit-btn" style="background: #10b981;" onclick="loginAsAdmin()">LOGIN</button>
                 </div>
             </div>
         </div>
@@ -539,7 +558,7 @@
                     <!-- Truck Selection Dropdown (appears when multiple jobs found) -->
                     <div id="truckSelectionDiv" style="display: none; margin-bottom: 20px;">
                         <div class="form-group">
-                            <label>เลือกงาน *</label>
+                            <label>เลือกงานอื่น ๆ *</label>
                             <select id="truckSelectionDropdown" required onchange="loadTruckDetails()">
                                 <option value="">-- เลือกงาน --</option>
                             </select>
@@ -795,11 +814,10 @@
                     dropdown.innerHTML = '<option value="">-- เลือกงาน --</option>';
 
                     for (let i = 0; i < data.getNumberOfRows(); i++) {
-                        const region = data.getValue(i, 9) || 'ไม่ระบุ';
                         const customer = data.getValue(i, 13) || 'ไม่ระบุ';
                         const option = document.createElement('option');
                         option.value = i;
-                        option.textContent = `ภาค: ${region} | ลูกค้า: ${customer}`;
+                        option.textContent = `ลูกค้า: ${customer}`;
                         dropdown.appendChild(option);
                     }
 
@@ -824,6 +842,16 @@
             const jobType = data.getValue(rowIndex, 12) || 'เลือกประเภทงาน';
             const branchCode = data.getValue(rowIndex, 11) || '';
             const customer = data.getValue(rowIndex, 13) || '';
+            const installDate = data.getValue(rowIndex, 2) || '';
+
+            // Set installation date from truck data
+            if (installDate) {
+                let dateStr = installDate;
+                if (installDate instanceof Date) {
+                    dateStr = installDate.toISOString().split('T')[0];
+                }
+                document.getElementById('installationDate').value = dateStr;
+            }
 
             const card = addJob();
             if (card) {
