@@ -41,6 +41,10 @@
             border-color: white;
         }
 
+        #dashboardMenuBtn {
+            display: none;
+        }
+
         /* ============ TECHNICIAN MODE ============ */
         #technicianMode { display: none; }
         #technicianMode.active { display: block; padding: 20px; }
@@ -85,9 +89,9 @@
 
         .login-wrapper {
             width: 100%;
-            max-width: 880px;
+            max-width: 900px;
             display: grid;
-            grid-template-columns: minmax(0, 380px) 1fr;
+            grid-template-columns: 1fr 1fr;
             gap: 36px;
             background: rgba(255, 255, 255, 0.10);
             border: 1px solid rgba(255, 255, 255, 0.28);
@@ -97,8 +101,23 @@
         }
 
         @media (max-width: 900px) {
-            .login-wrapper { grid-template-columns: 1fr; max-width: 400px; }
+            .login-wrapper { grid-template-columns: 1fr; max-width: 500px; }
             .login-illustration { display: none; }
+        }
+
+        .login-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .login-section h2 {
+            color: white;
+            font-size: 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
         .login-logo {
@@ -450,6 +469,60 @@
         .detail-label { font-weight: 600; color: #6b7280; font-size: 13px; }
         .detail-value { color: #1f2937; }
 
+        /* ============ USER MANAGEMENT ============ */
+        .user-form {
+            background: #f9fafb;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+        }
+
+        .user-form h3 { color: #1f2937; margin-bottom: 20px; font-size: 16px; }
+
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+
+        .user-form .form-group { margin-bottom: 0; }
+
+        .user-list {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .user-list h3 { color: #1f2937; margin-bottom: 20px; font-size: 16px; }
+
+        .user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: #f9fafb;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            border-left: 4px solid #2563eb;
+        }
+
+        .user-info { flex: 1; }
+
+        .user-name { font-weight: 700; color: #1f2937; font-size: 15px; }
+
+        .user-phone { font-size: 13px; color: #6b7280; margin-top: 4px; }
+
+        .delete-user-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s;
+        }
+
+        .delete-user-btn:hover { background: #b91c1c; }
+
         @media (max-width: 768px) {
             .admin-header { flex-direction: column; gap: 15px; text-align: center; }
             .search-box { width: 100%; }
@@ -467,28 +540,39 @@
     <button class="menu-btn" id="dashboardMenuBtn" onclick="accessDashboard()">📊 Dashboard</button>
 </div>
 
-<!-- ============ TECHNICIAN MODE ============ -->
-<div id="technicianMode" class="active">
-    <div id="loginPage" class="active">
-        <div class="login-wrapper">
-            <div class="login-illustration" style="text-align: center; display: flex; flex-direction: column; justify-content: center;">
-                <div class="login-logo" style="margin-top: 0;">
-                    <span style="font-size: 48px;">📋</span>
-                </div>
-                <div class="login-brand">RBS Logistics</div>
-                <div class="login-subtitle">ระบบประเมินการติดตั้ง Shelf</div>
+<!-- ============ LOGIN PAGE (UNIFIED) ============ -->
+<div id="loginPage" class="active">
+    <div class="login-wrapper">
+        <!-- TECHNICIAN LOGIN -->
+        <div class="login-section">
+            <h2>👨‍🔧 ช่าง</h2>
+            <div class="login-field">
+                <span class="field-icon">📱</span>
+                <input type="text" id="phoneNumber" placeholder="เบอร์โทรศัพท์">
             </div>
-            <div>
-                <div class="login-brand" style="margin-bottom: 20px;">ช่าง</div>
-                <div class="login-field">
-                    <span class="field-icon">📱</span>
-                    <input type="text" id="phoneNumber" placeholder="เบอร์โทรศัพท์">
-                </div>
-                <button class="login-submit-btn" onclick="loginTechnician()">เข้าสู่ระบบ</button>
-                <div id="message" class="message" style="margin-top: 15px;"></div>
+            <button class="login-submit-btn" onclick="loginTechnician()" style="margin-top: 10px;">เข้าสู่ระบบ</button>
+            <div id="techMessage" class="message" style="margin-top: 10px;"></div>
+        </div>
+
+        <!-- ADMIN LOGIN -->
+        <div class="login-section">
+            <h2>🔐 Admin</h2>
+            <div class="login-field">
+                <span class="field-icon">👤</span>
+                <input type="text" id="adminUsername" placeholder="ชื่อผู้ใช้">
             </div>
+            <div class="login-field">
+                <span class="field-icon">🔒</span>
+                <input type="password" id="adminPassword" placeholder="รหัสผ่าน">
+            </div>
+            <button class="login-submit-btn" onclick="adminLogin()" style="margin-top: 10px;">เข้าสู่ระบบ</button>
+            <div id="adminMessage" class="message" style="margin-top: 10px;"></div>
         </div>
     </div>
+</div>
+
+<!-- ============ TECHNICIAN MODE ============ -->
+<div id="technicianMode" class="active" style="display: none;">
 
     <div id="formPage" style="display: none; padding: 20px;">
         <div class="container">
@@ -635,24 +719,8 @@
     </div>
 </div>
 
-<!-- ============ ADMIN MODE ============ -->
-<div id="adminMode">
-    <div id="adminLoginPage" class="active">
-        <div class="login-box">
-            <h1>🔐 Admin</h1>
-            <p>จัดการข้อมูลประเมินและใช้งานระบบ</p>
-            <div class="form-group">
-                <label>ชื่อผู้ใช้</label>
-                <input type="text" id="adminUsername" placeholder="Enter username">
-            </div>
-            <div class="form-group">
-                <label>รหัสผ่าน</label>
-                <input type="password" id="adminPassword" placeholder="Enter password">
-            </div>
-            <button class="btn btn-primary" onclick="adminLogin()">เข้าสู่ระบบ</button>
-        </div>
-    </div>
-
+<!-- ============ ADMIN DASHBOARD ============ -->
+<div id="adminMode" style="display: none;">
     <div id="adminDashboard" style="display: none;">
         <div class="admin-header">
             <div>
@@ -666,6 +734,7 @@
             <div class="tabs-nav">
                 <button class="tab-btn active" onclick="switchAdminTab(this, 'overview')">📊 ภาพรวม</button>
                 <button class="tab-btn" onclick="switchAdminTab(this, 'submissions')">📋 ข้อมูลที่ส่ง</button>
+                <button class="tab-btn" onclick="switchAdminTab(this, 'users')">👥 จัดการผู้ใช้</button>
             </div>
 
             <!-- TAB: OVERVIEW -->
@@ -746,6 +815,29 @@
                     <div class="pagination" id="pagination"></div>
                 </div>
             </div>
+
+            <!-- TAB: USERS -->
+            <div id="users" class="tab-content">
+                <div class="user-form">
+                    <h3>➕ เพิ่มผู้ใช้ใหม่</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>เบอร์โทรศัพท์ *</label>
+                            <input type="text" id="newUserPhone" placeholder="0812345678">
+                        </div>
+                        <div class="form-group">
+                            <label>ชื่อ (ไม่บังคับ)</label>
+                            <input type="text" id="newUserName" placeholder="ชื่อผู้ใช้">
+                        </div>
+                    </div>
+                    <button class="btn btn-primary" onclick="addNewUser()">เพิ่มผู้ใช้</button>
+                </div>
+
+                <div class="user-list">
+                    <h3>👥 ผู้ใช้จัดการระบบ</h3>
+                    <div id="usersList"></div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -767,8 +859,24 @@
 
     let jobTypes = [];
     let allSubmissions = [];
+    let adminUsers = [];
     let currentPage = 1;
     const itemsPerPage = 10;
+
+    // Initialize admin users
+    function initAdminUsers() {
+        const stored = localStorage.getItem('adminUsers');
+        if (!stored) {
+            adminUsers = [
+                { phone: '0812345678', name: 'admin1' }
+            ];
+            localStorage.setItem('adminUsers', JSON.stringify(adminUsers));
+        } else {
+            adminUsers = JSON.parse(stored);
+        }
+    }
+
+    initAdminUsers();
 
     // ============ MODE SWITCHING ============
     function switchMode(mode) {
@@ -790,14 +898,15 @@
 
     function accessDashboard() {
         if (localStorage.getItem('adminLoggedIn') === 'true') {
-            switchMode('admin');
-            document.getElementById('adminLoginPage').classList.remove('active');
+            document.getElementById('adminMode').style.display = 'block';
             document.getElementById('adminDashboard').style.display = 'block';
             document.querySelector('#dashboardMenuBtn').classList.add('active');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('overview').classList.add('active');
+            document.querySelector('[onclick="switchAdminTab(this, \'overview\')"]').classList.add('active');
             loadAdminData();
         } else {
             alert('กรุณา Login ด้วยบัญชี Admin ก่อน');
-            switchMode('admin');
         }
     }
 
@@ -805,7 +914,7 @@
     function loginTechnician() {
         const phone = document.getElementById('phoneNumber').value.trim();
         if (!phone) {
-            showMessage('กรุณาใส่เบอร์โทรศัพท์', 'error');
+            showTechMessage('กรุณาใส่เบอร์โทรศัพท์', 'error');
             return;
         }
 
@@ -814,6 +923,7 @@
         document.getElementById('phone').value = phoneStr;
         document.getElementById('userInfo').innerHTML = `<strong>ยินดีต้อนรับ:</strong> ${phoneStr}`;
         document.getElementById('loginPage').classList.remove('active');
+        document.getElementById('technicianMode').style.display = 'block';
         document.getElementById('formPage').style.display = 'block';
         document.getElementById('installDate').valueAsDate = new Date();
         loadJobTypes();
@@ -822,8 +932,18 @@
     function logoutTechnician() {
         localStorage.removeItem('technicianPhone');
         document.getElementById('loginPage').classList.add('active');
+        document.getElementById('technicianMode').style.display = 'none';
         document.getElementById('formPage').style.display = 'none';
         document.getElementById('phoneNumber').value = '';
+        document.getElementById('adminUsername').value = '';
+        document.getElementById('adminPassword').value = '';
+    }
+
+    function showTechMessage(text, type) {
+        const msg = document.getElementById('techMessage');
+        msg.textContent = text;
+        msg.className = 'message show ' + type;
+        setTimeout(() => msg.classList.remove('show'), 3000);
     }
 
     function loadJobTypes() {
@@ -878,12 +998,6 @@
             .catch(e => alert('ข้อผิดพลาด: ' + e));
     }
 
-    function showMessage(text, type) {
-        const msg = document.getElementById('message');
-        msg.textContent = text;
-        msg.className = 'message show ' + type;
-        setTimeout(() => msg.classList.remove('show'), 3000);
-    }
 
     // ============ ADMIN ============
     function adminLogin() {
@@ -892,24 +1006,34 @@
 
         if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
             localStorage.setItem('adminLoggedIn', 'true');
-            document.getElementById('adminLoginPage').classList.remove('active');
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('adminMode').style.display = 'block';
             document.getElementById('adminDashboard').style.display = 'block';
+            document.querySelector('#dashboardMenuBtn').style.display = 'inline-block';
             document.querySelector('#dashboardMenuBtn').classList.add('active');
             loadAdminData();
         } else {
-            alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+            showAdminMessage('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง', 'error');
         }
     }
 
     function adminLogout() {
         localStorage.removeItem('adminLoggedIn');
-        document.getElementById('adminLoginPage').classList.add('active');
+        document.getElementById('loginPage').classList.add('active');
+        document.getElementById('adminMode').style.display = 'none';
         document.getElementById('adminDashboard').style.display = 'none';
+        document.querySelector('#dashboardMenuBtn').style.display = 'none';
+        document.querySelector('#dashboardMenuBtn').classList.remove('active');
         document.getElementById('adminUsername').value = '';
         document.getElementById('adminPassword').value = '';
         document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelector('[onclick="switchMode(\'technician\')"]').classList.add('active');
-        document.getElementById('technicianMode').classList.add('active');
+    }
+
+    function showAdminMessage(text, type) {
+        const msg = document.getElementById('adminMessage');
+        msg.textContent = text;
+        msg.className = 'message show ' + type;
+        setTimeout(() => msg.classList.remove('show'), 3000);
     }
 
     function loadAdminData() {
@@ -1018,6 +1142,67 @@
         document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById(tabId).classList.add('active');
+
+        if (tabId === 'users') {
+            renderUsersList();
+        }
+    }
+
+    function addNewUser() {
+        const phone = document.getElementById('newUserPhone').value.trim();
+        const name = document.getElementById('newUserName').value.trim();
+
+        if (!phone) {
+            alert('กรุณาใส่เบอร์โทร');
+            return;
+        }
+
+        const phoneStr = phone.startsWith('0') ? phone : '0' + phone;
+
+        // Check if user already exists
+        if (adminUsers.find(u => u.phone === phoneStr)) {
+            alert('ผู้ใช้นี้มีอยู่แล้ว');
+            return;
+        }
+
+        adminUsers.push({
+            phone: phoneStr,
+            name: name || 'ผู้ใช้ ' + phoneStr
+        });
+
+        localStorage.setItem('adminUsers', JSON.stringify(adminUsers));
+        document.getElementById('newUserPhone').value = '';
+        document.getElementById('newUserName').value = '';
+        renderUsersList();
+        alert('เพิ่มผู้ใช้สำเร็จ');
+    }
+
+    function deleteUser(phone) {
+        if (confirm('ยืนยันการลบผู้ใช้ ' + phone + '?')) {
+            adminUsers = adminUsers.filter(u => u.phone !== phone);
+            localStorage.setItem('adminUsers', JSON.stringify(adminUsers));
+            renderUsersList();
+            alert('ลบผู้ใช้สำเร็จ');
+        }
+    }
+
+    function renderUsersList() {
+        const container = document.getElementById('usersList');
+
+        if (adminUsers.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #9ca3af; padding: 20px;">ไม่มีผู้ใช้</p>';
+            return;
+        }
+
+        container.innerHTML = adminUsers.map(user => `
+            <div class="user-item">
+                <div class="user-info">
+                    <div class="user-name">${user.name}</div>
+                    <div class="user-phone">${user.phone}</div>
+                </div>
+                <button class="delete-user-btn" onclick="deleteUser('${user.phone}')">ลบ</button>
+            </div>
+        `).join('');
     }
 
     function viewDetail(idx) {
@@ -1090,15 +1275,18 @@
 
     // Check auth on load
     if (localStorage.getItem('adminLoggedIn') === 'true') {
+        document.getElementById('loginPage').classList.remove('active');
+        document.getElementById('adminMode').style.display = 'block';
+        document.getElementById('adminDashboard').style.display = 'block';
+        document.querySelector('#dashboardMenuBtn').style.display = 'inline-block';
         document.querySelector('#dashboardMenuBtn').classList.add('active');
-    }
-
-    if (localStorage.getItem('technicianPhone')) {
-        switchMode('technician');
+        loadAdminData();
+    } else if (localStorage.getItem('technicianPhone')) {
         const phone = localStorage.getItem('technicianPhone');
         document.getElementById('phone').value = phone;
         document.getElementById('userInfo').innerHTML = `<strong>ยินดีต้อนรับ:</strong> ${phone}`;
         document.getElementById('loginPage').classList.remove('active');
+        document.getElementById('technicianMode').style.display = 'block';
         document.getElementById('formPage').style.display = 'block';
         loadJobTypes();
     }
