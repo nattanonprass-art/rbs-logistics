@@ -1308,15 +1308,6 @@
 
             const card = document.querySelector('.job-card');
             if (card) {
-                // Update job number in header - find span with "งาน #"
-                const headerDiv = card.querySelector('.job-header > div');
-                if (headerDiv) {
-                    const spans = headerDiv.querySelectorAll('span');
-                    if (spans.length > 1) {
-                        spans[1].textContent = `งาน #${jobIdx + 1}`;
-                    }
-                }
-
                 card.querySelector(`[name*="_customer"]`).value = selectedJob.customer || '';
                 card.querySelector(`[name*="_customerType"]`).value = selectedJob.customerType || '';
                 card.querySelector(`[name*="_type"]`).value = matchingType || jobTypeValue || 'เลือกประเภทงาน';
@@ -1344,7 +1335,7 @@
                     if (!badge) {
                         badge = document.createElement('span');
                         badge.className = 'job-status-badge';
-                        badge.style.cssText = 'display: inline-block; background: #10b981; color: white; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; white-space: nowrap;';
+                        badge.style.cssText = 'background: #10b981; color: white; padding: 6px 10px; border-radius: 18px; font-size: 12px; font-weight: 600; white-space: nowrap; flex-shrink: 0;';
                         header.appendChild(badge);
                     }
                     badge.textContent = '✅ สำเร็จ';
@@ -1376,12 +1367,12 @@
             `).join('');
 
             card.innerHTML = `
-                <div class="job-header" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 2px solid #e5e7eb;">
-                    <div style="display: flex; align-items: center; gap: 8px; flex: 1;">
-                        <span style="color: #6b7280; font-weight: 500;">ภาค:</span>
-                        <input type="text" name="job${jobCount}_region" placeholder="RBSL04" style="flex: 1; max-width: 120px; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px;">
+                <div class="job-header" style="display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 2px solid #e5e7eb; row-gap: 8px;">
+                    <div style="display: flex; align-items: center; gap: 6px; min-width: 150px; flex: 1;">
+                        <span style="color: #6b7280; font-weight: 500; white-space: nowrap;">ภาค:</span>
+                        <input type="text" name="job${jobCount}_region" placeholder="RBSL04" style="flex: 1; min-width: 80px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                     </div>
-                    <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})" style="flex-shrink: 0;">ลบ</button>
+                    <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})" style="flex-shrink: 0; padding: 4px 12px; font-size: 12px;">ลบ</button>
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                     <div class="form-group">
