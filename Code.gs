@@ -87,13 +87,21 @@ function sign(data, secret) {
 }
 
 function handleAddUser(body) {
-  var sheet = SpreadsheetApp.openById(USERS_SHEET_ID).getSheets()[0];
+  var spreadsheet = SpreadsheetApp.openById(USERS_SHEET_ID);
+  var sheet = spreadsheet.getSheetByName('Users');
+  if (!sheet) {
+    sheet = spreadsheet.getSheets()[1]; // Fallback to 2nd sheet if Users sheet not found
+  }
   sheet.appendRow([body.name || '', String(body.phone || ''), body.timestamp || new Date()]);
   return json({ success: true });
 }
 
 function handleDeleteUser(body) {
-  var sheet = SpreadsheetApp.openById(USERS_SHEET_ID).getSheets()[0];
+  var spreadsheet = SpreadsheetApp.openById(USERS_SHEET_ID);
+  var sheet = spreadsheet.getSheetByName('Users');
+  if (!sheet) {
+    sheet = spreadsheet.getSheets()[1]; // Fallback to 2nd sheet if Users sheet not found
+  }
   var data = sheet.getDataRange().getValues();
   for (var i = data.length - 1; i >= 1; i--) {
     if (String(data[i][1]) === String(body.phone)) {
