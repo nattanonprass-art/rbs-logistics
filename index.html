@@ -853,15 +853,27 @@
             if (installDate) {
                 let dateStr = '';
                 if (installDate instanceof Date) {
-                    dateStr = installDate.toISOString().split('T')[0];
+                    // Convert Date object to dd/mm/yyyy format
+                    const d = String(installDate.getDate()).padStart(2, '0');
+                    const m = String(installDate.getMonth() + 1).padStart(2, '0');
+                    const y = installDate.getFullYear();
+                    dateStr = `${d}/${m}/${y}`;
                 } else if (typeof installDate === 'string' && installDate.trim()) {
-                    // Convert from yyyy/mm/dd to yyyy-mm-dd format
-                    dateStr = installDate.trim().replace(/\//g, '-');
+                    // Convert from yyyy/mm/dd to dd/mm/yyyy format
+                    const parts = installDate.trim().split('/');
+                    if (parts.length === 3) {
+                        dateStr = `${parts[2]}/${parts[1]}/${parts[0]}`;
+                    } else {
+                        dateStr = installDate.trim();
+                    }
                 } else if (typeof installDate === 'number') {
                     // Handle Google Sheets serial date format
                     const baseDate = new Date(1899, 11, 30);
                     const resultDate = new Date(baseDate.getTime() + installDate * 24 * 60 * 60 * 1000);
-                    dateStr = resultDate.toISOString().split('T')[0];
+                    const d = String(resultDate.getDate()).padStart(2, '0');
+                    const m = String(resultDate.getMonth() + 1).padStart(2, '0');
+                    const y = resultDate.getFullYear();
+                    dateStr = `${d}/${m}/${y}`;
                 }
                 if (dateStr) {
                     document.getElementById('installationDate').value = dateStr;
