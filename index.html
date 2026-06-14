@@ -693,7 +693,7 @@
 
                     <div class="login-field">
                         <span class="field-icon">📱</span>
-                        <input type="tel" id="loginPhone" placeholder="เบอร์โทรศัพท์" onkeypress="if(event.key==='Enter')loginAsUser()">
+                        <input type="text" id="loginPhone" placeholder="เบอร์โทรศัพท์" maxlength="10" onkeypress="if(event.key==='Enter')loginAsUser()">
                     </div>
 
                     <button class="login-submit-btn" onclick="loginAsUser()">LOGIN</button>
@@ -843,7 +843,7 @@
                         <div class="grid-2">
                             <div class="form-group">
                                 <label>เบอร์โทรศัพท์ *</label>
-                                <input type="tel" id="newUserPhone" placeholder="0812345678" maxlength="10">
+                                <input type="text" id="newUserPhone" placeholder="0812345678" maxlength="10">
                             </div>
                             <div class="form-group">
                                 <label>ชื่อ (ไม่จำเป็น)</label>
@@ -1377,7 +1377,8 @@
             card.innerHTML = `
                 <div class="job-header" style="display: flex; flex-wrap: wrap; justify-content: flex-start; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 2px solid #e5e7eb; row-gap: 8px;">
                     <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
-                        <input type="text" name="job${jobCount}_region" placeholder="ภาค" style="flex: 1; max-width: 100px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
+                        <span style="color: #6b7280; font-weight: 500; white-space: nowrap; font-size: 12px;">ภาค :</span>
+                        <input type="text" name="job${jobCount}_region" placeholder="RBSL04" style="flex: 1; max-width: 80px; padding: 4px 6px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px;">
                     </div>
                     <button type="button" class="btn-small btn-danger" onclick="removeJob(${jobCount})" style="flex-shrink: 0; padding: 4px 12px; font-size: 12px;">ลบ</button>
                 </div>
