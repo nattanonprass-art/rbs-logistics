@@ -86,22 +86,15 @@
 
         .login-wrapper {
             width: 100%;
-            max-width: 880px;
-            display: grid;
-            grid-template-columns: minmax(0, 380px) 1px minmax(0, 380px);
-            gap: 36px;
+            max-width: 450px;
+            display: flex;
+            flex-direction: column;
+            gap: 0;
             background: rgba(255, 255, 255, 0.10);
             border: 1px solid rgba(255, 255, 255, 0.28);
             border-radius: 24px;
-            padding: 38px;
+            padding: 32px;
             backdrop-filter: blur(10px);
-        }
-
-        @media (max-width: 900px) {
-            .login-wrapper {
-                grid-template-columns: 1fr;
-                max-width: 400px;
-            }
         }
 
         .login-section {
@@ -111,15 +104,9 @@
         }
 
         .login-divider {
-            display: none;
-            border-left: 1px solid rgba(255,255,255,0.2);
-            margin: 0;
-        }
-
-        @media (min-width: 901px) {
-            .login-divider {
-                display: block;
-            }
+            display: block;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            margin: 24px 0;
         }
 
         .login-logo {
@@ -493,7 +480,8 @@
         <!-- LOGIN PAGE -->
         <div id="loginPage" class="active">
             <div class="login-wrapper">
-                <div style="text-align: center;">
+                <!-- Logo Section -->
+                <div style="text-align: center; margin-bottom: 20px;">
                     <div class="login-logo">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
                             <line x1="5" y1="4" x2="5" y2="20"/>
@@ -505,17 +493,24 @@
                     </div>
                     <h1 class="login-brand">RBS Logistics</h1>
                     <p class="login-subtitle">ระบบประเมินการติดตั้ง Shelf</p>
-                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-top: 16px;">👨‍🔧 สำหรับช่าง</p>
+                </div>
 
-                    <div class="message" id="loginMsg"></div>
+                <div class="message" id="loginMsg"></div>
 
+                <!-- Technician Section -->
+                <div style="text-align: center;">
+                    <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">👨‍🔧 สำหรับช่าง</p>
                     <div class="login-field">
                         <input type="tel" id="loginPhone" placeholder="เบอร์โทรศัพท์" onkeypress="if(event.key==='Enter')loginAsUser()">
                     </div>
                     <button class="login-submit-btn" onclick="loginAsUser()">LOGIN</button>
                 </div>
 
-                <div style="text-align: center; border-left: 1px solid rgba(255,255,255,0.2); padding-left: 36px;">
+                <!-- Divider -->
+                <div class="login-divider"></div>
+
+                <!-- Admin Section -->
+                <div style="text-align: center;">
                     <p style="font-size: 12px; color: rgba(255,255,255,0.7); margin-bottom: 16px;">🔐 สำหรับแอดมิน</p>
                     <div class="login-field">
                         <input type="text" id="adminId" placeholder="Admin ID" onkeypress="if(event.key==='Enter')loginAsAdmin()">
