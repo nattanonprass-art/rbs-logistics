@@ -573,7 +573,10 @@
         #submissionModal {
             display: none;
             position: fixed;
-            inset: 0;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
             background: rgba(0,0,0,0.5);
             z-index: 1000;
             align-items: center;
@@ -820,13 +823,13 @@
                                 <thead>
                                     <tr>
                                         <th>วันที่ติดติด</th>
-                                        <th>วันที่ submit</th>
                                         <th>เบอร์โทร</th>
                                         <th>ใบรถ</th>
                                         <th>ชื่อ</th>
                                         <th>ลูกค้า</th>
                                         <th>จำนวนงาน</th>
                                         <th>เฉลี่ย</th>
+                                        <th>วันที่ submit</th>
                                         <th>ดำเนินการ</th>
                                     </tr>
                                 </thead>
@@ -1640,7 +1643,7 @@
 
                     const actions = `<button class="btn-small btn-primary" onclick="viewSubmission('${esc(sub.id)}')" style="margin-right: 5px;">ดู</button><button class="btn-small btn-danger" onclick="deleteSubmission('${esc(sub.id)}')">ลบ</button>`;
 
-                    rows.push(`<tr><td>${esc(installDateStr)}</td><td>${esc(submitDateStr)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${actions}</td></tr>`);
+                    rows.push(`<tr><td>${esc(installDateStr)}</td><td>${esc(sub.phone)}</td><td>${esc(sub.truck)}</td><td>${esc(sub.name)}</td><td>${esc(sub.customer)}</td><td>${sub.jobCount}</td><td><strong>${esc(avgDisplay)}</strong></td><td>${esc(submitDateStr)}</td><td>${actions}</td></tr>`);
                 });
 
                 tbody.innerHTML = rows.join('');
