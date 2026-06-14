@@ -809,10 +809,11 @@
                     dropdown.innerHTML = '<option value="">-- เลือกงาน --</option>';
 
                     for (let i = 0; i < data.getNumberOfRows(); i++) {
+                        const jobOrder = data.getValue(i, 1) || 'ลำดับที่';
                         const customer = data.getValue(i, 13) || 'ไม่ระบุ';
                         const option = document.createElement('option');
                         option.value = i;
-                        option.textContent = `ลูกค้า: ${customer}`;
+                        option.textContent = `ลำดับที่ ${jobOrder} - ลูกค้า: ${customer}`;
                         dropdown.appendChild(option);
                     }
 
@@ -834,18 +835,28 @@
 
         function loadTruckDataFromRow(data, rowIndex) {
             const region = data.getValue(rowIndex, 9) || '-';
-            const jobType = data.getValue(rowIndex, 12) || 'เลือกประเภทงาน';
+            const jobType = data.getValue(rowIndex, 10) || 'เลือกประเภทงาน';
             const branchCode = data.getValue(rowIndex, 11) || '';
             const customer = data.getValue(rowIndex, 13) || '';
             const installDate = data.getValue(rowIndex, 2) || '';
+            const jobOrder = data.getValue(rowIndex, 1) || '';
 
             // Set installation date from truck data
             if (installDate) {
-                let dateStr = installDate;
+                let dateStr = '';
                 if (installDate instanceof Date) {
                     dateStr = installDate.toISOString().split('T')[0];
+                } else if (typeof installDate === 'string' && installDate.trim()) {
+                    dateStr = installDate.trim();
+                } else if (typeof installDate === 'number') {
+                    // Handle Google Sheets serial date format
+                    const baseDate = new Date(1899, 11, 30);
+                    const resultDate = new Date(baseDate.getTime() + installDate * 24 * 60 * 60 * 1000);
+                    dateStr = resultDate.toISOString().split('T')[0];
                 }
-                document.getElementById('installationDate').value = dateStr;
+                if (dateStr) {
+                    document.getElementById('installationDate').value = dateStr;
+                }
             }
 
             const card = addJob();
