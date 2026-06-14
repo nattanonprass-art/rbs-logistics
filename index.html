@@ -1544,4 +1544,85 @@
 
             fetch(GOOGLE_APPS_SCRIPT_URL, {
                 method: 'POST',
-                body: JSON.stringify({ action: 'addUser', toke
+                body: JSON.stringify({ action: 'addUser', token: adminToken, phone: phone, name: name || 'ช่าง ' + phone, timestamp: new Date().toLocaleString('th-TH') })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('newUserPhone').value = '';
+                    document.getElementById('newUserName').value = '';
+                    loadUsers();
+                    showMsg('usersMsg', '✅ เพิ่มสำเร็จ', false);
+                } else {
+                    showMsg('usersMsg', '❌ ไม่สำเร็จ', true);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showMsg('usersMsg', '❌ เกิดข้อผิดพลาด', true);
+            });
+        }
+
+        function loadUsers() {
+            const list = document.getElementById('usersList');
+            list.innerHTML = '<p style="color: #6b7280; text-align: center;">กำลังโหลด...</p>';
+
+            const query = new google.visualization.Query(
+                `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=${USERS_GID}`
+            );
+
+            query.send(resp => {
+                if (resp.isError()) {
+                    list.innerHTML = '<p style="color: #6b7280;">ไม่สามารถโหลด</p>';
+                    return;
+                }
+
+                const data = resp.getDataTable();
+                if (data.getNumberOfRows() === 0) {
+                    list.innerHTML = '<p style="color: #6b7280; text-align: center;">ไม่มีผู้ใช้</p>';
+                    return;
+                }
+
+                const users = [];
+                for (let i = 0; i < data.getNumberOfRows(); i++) {
+                    users.push({ name: data.getValue(i, 0), phone: data.getValue(i, 1) });
+                }
+
+                list.innerHTML = users.map(u => `
+                    <div class="user-item">
+                        <div><strong>${esc(u.name || '-')}</strong><br><small style="color: #6b7280;">${esc(u.phone || '-')}</small></div>
+                        <button class="btn-small btn-danger" onclick="deleteUser('${esc(u.phone)}')">ลบ</button>
+                    </div>
+                `).join('');
+            });
+        }
+
+        function deleteUser(phone) {
+            if (!confirm('ต้องการลบ?')) return;
+
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'deleteUser', token: adminToken, phone: phone })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    loadUsers();
+                    showMsg('usersMsg', '✅ ลบสำเร็จ', false);
+                } else {
+                    showMsg('usersMsg', '❌ ลบไม่สำเร็จ', true);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showMsg('usersMsg', '❌ เกิดข้อผิดพลาด', true);
+            });
+        }
+
+        // ======================== UTILITY ========================
+        function esc(s) {
+            return String(s || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+    </script>
+</body>
+</html>
