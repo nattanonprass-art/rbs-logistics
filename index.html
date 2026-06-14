@@ -464,6 +464,7 @@
 <div class="top-menu">
     <button class="menu-btn active" onclick="switchMode('technician')">👨‍🔧 ช่าง</button>
     <button class="menu-btn" onclick="switchMode('admin')">🔐 Admin</button>
+    <button class="menu-btn" id="dashboardMenuBtn" onclick="accessDashboard()">📊 Dashboard</button>
 </div>
 
 <!-- ============ TECHNICIAN MODE ============ -->
@@ -787,6 +788,19 @@
         }
     }
 
+    function accessDashboard() {
+        if (localStorage.getItem('adminLoggedIn') === 'true') {
+            switchMode('admin');
+            document.getElementById('adminLoginPage').classList.remove('active');
+            document.getElementById('adminDashboard').style.display = 'block';
+            document.querySelector('#dashboardMenuBtn').classList.add('active');
+            loadAdminData();
+        } else {
+            alert('กรุณา Login ด้วยบัญชี Admin ก่อน');
+            switchMode('admin');
+        }
+    }
+
     // ============ TECHNICIAN ============
     function loginTechnician() {
         const phone = document.getElementById('phoneNumber').value.trim();
@@ -880,6 +894,7 @@
             localStorage.setItem('adminLoggedIn', 'true');
             document.getElementById('adminLoginPage').classList.remove('active');
             document.getElementById('adminDashboard').style.display = 'block';
+            document.querySelector('#dashboardMenuBtn').classList.add('active');
             loadAdminData();
         } else {
             alert('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
@@ -892,6 +907,9 @@
         document.getElementById('adminDashboard').style.display = 'none';
         document.getElementById('adminUsername').value = '';
         document.getElementById('adminPassword').value = '';
+        document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelector('[onclick="switchMode(\'technician\')"]').classList.add('active');
+        document.getElementById('technicianMode').classList.add('active');
     }
 
     function loadAdminData() {
@@ -1072,10 +1090,7 @@
 
     // Check auth on load
     if (localStorage.getItem('adminLoggedIn') === 'true') {
-        switchMode('admin');
-        document.getElementById('adminLoginPage').classList.remove('active');
-        document.getElementById('adminDashboard').style.display = 'block';
-        loadAdminData();
+        document.querySelector('#dashboardMenuBtn').classList.add('active');
     }
 
     if (localStorage.getItem('technicianPhone')) {
