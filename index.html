@@ -650,15 +650,15 @@
                         <div class="admin-card" style="border-left: 4px solid #3b82f6;">
                             <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">📊 Total Jobs</div>
                             <div id="stat_totalJobs" style="font-size: 32px; font-weight: 700; color: #1a202c;">--</div>
-                            <div style="color: #a0aec0; font-size: 12px;">All assignments</div>
+                            <div style="color: #a0aec0; font-size: 12px;">งานทั้งหมด</div>
                         </div>
                         <div class="admin-card" style="border-left: 4px solid #10b981;">
-                            <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">✓ Completed</div>
+                            <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">📝 การประเมิน (ครั้ง)</div>
                             <div id="stat_completed" style="font-size: 32px; font-weight: 700; color: #1a202c;">--</div>
                             <div id="stat_completedPercent" style="color: #a0aec0; font-size: 12px;">0% done</div>
                         </div>
                         <div class="admin-card" style="border-left: 4px solid #f97316;">
-                            <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">⏳ Remaining</div>
+                            <div style="color: #718096; font-size: 14px; margin-bottom: 8px;">🚚 จำนวนรถ</div>
                             <div id="stat_remaining" style="font-size: 32px; font-weight: 700; color: #1a202c;">--</div>
                             <div id="stat_remainingPercent" style="color: #a0aec0; font-size: 12px;">0% pending</div>
                         </div>
@@ -745,7 +745,7 @@
             { id: 'accuracy', label: 'ความถูกต้องของงาน' },
             { id: 'timeliness', label: 'ความตรงเวลา' },
             { id: 'professionalism', label: 'ความเป็นมืออาชีพ' },
-            { id: 'cleanliness', label: 'ความสะอาด/อุลเสิทธิ์' },
+            { id: 'cleanliness', label: 'ความสะอาด/เรียบร้อย' },
             { id: 'communication', label: 'การสื่อสาร/บริการลูกค้า' }
         ];
 
@@ -764,8 +764,24 @@
                 showLoginMsg('กรุณากรอกเบอร์โทร', true);
                 return;
             }
-            currentUser = { phone: phone, name: 'ช่าง ' + phone, isAdmin: false };
-            showPage('technicianPage');
+
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: 'technicianLogin', phone: phone })
+            })
+            .then(r => r.json())
+            .then(data => {
+                if (data.success) {
+                    currentUser = { phone: data.phone || phone, name: data.name, isAdmin: false };
+                    showPage('technicianPage');
+                } else {
+                    showLoginMsg('❌ ' + (data.error || 'ไม่พบเบอร์โทรนี้ในระบบ'), true);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showLoginMsg('❌ เกิดข้อผิดพลาด', true);
+            });
         }
 
         function loginAsAdmin() {
@@ -996,6 +1012,11 @@
                 </div>
 
                 <div class="form-group">
+                    <label>ประเภทลูกค้า</label>
+                    <input type="text" name="job${jobCount}_customerType" placeholder="เช่น Modern Trade / ร้านค้าปลีก">
+                </div>
+
+                <div class="form-group">
                     <label>ประเภทงาน *</label>
                     <select name="job${jobCount}_type" required>
                         <option value="">เลือกประเภทงาน</option>
@@ -1053,66 +1074,73 @@
                 return;
             }
 
-            // Submit 1:1 - each job separately
+            // Collect and validate all jobs, then send as a single request
+            const jobs = [];
             for (const [idx, card] of Array.from(cards).entries()) {
-                const customer = card.querySelector('input[name*="_customer"]').value.trim();
+                const customer = card.querySelector('input[name$="_customer"]').value.trim();
                 if (!customer) {
                     alert('กรุณากรอกชื่อลูกค้างาน ' + (idx + 1));
                     return;
                 }
 
-                const type = card.querySelector('select[name*="_type"]').value;
+                const type = card.querySelector('select[name$="_type"]').value;
                 if (type === '') {
                     alert('กรุณาเลือกประเภทงาน ' + (idx + 1));
                     return;
                 }
 
-                const jobData = {
-                    action: 'handleSubmission',
-                    timestamp: new Date().toLocaleString('th-TH'),
-                    phone: currentUser.phone,
-                    name: currentUser.name,
-                    truckNumber: document.getElementById('truckNumber').value,
-                    installationDate: document.getElementById('installationDate').value,
-                    jobs: [{
-                        customer: customer,
-                        type: type,
-                        location: card.querySelector('input[name*="_location"]').value || '',
-                        region: card.querySelector('.job-region').textContent.replace('ภาค: ', ''),
-                        scores: Object.fromEntries(
-                            criteria.map(c => [c.id, parseInt(card.querySelector(`input[name*="_${c.id}"]`).value)])
-                        ),
-                        comments: card.querySelector('textarea[name*="_comments"]').value || ''
-                    }]
-                };
-
-                fetch(GOOGLE_APPS_SCRIPT_URL, {
-                    method: 'POST',
-                    body: JSON.stringify(jobData)
-                })
-                .then(r => r.json())
-                .then(res => {
-                    if (res.status === 'success' || res.success) {
-                        if (idx === cards.length - 1) {
-                            showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
-                            setTimeout(() => {
-                                // Clear only job cards, keep truck number and installation date
-                                document.getElementById('jobsContainer').innerHTML = '';
-                                document.getElementById('truckSelectionDiv').style.display = 'none';
-                                jobCount = 0;
-                                addJob(); // Add fresh job card
-                            }, 2000);
-                        }
-                    } else {
-                        console.error('API Error:', res);
-                        showMsg('formMsg', '❌ ส่งไม่สำเร็จ: ' + (res.error || 'Unknown error'), true);
-                    }
-                })
-                .catch(err => {
-                    console.error('Fetch Error:', err);
-                    showMsg('formMsg', '❌ เกิดข้อผิดพลาด', true);
+                jobs.push({
+                    customer: customer,
+                    customerType: card.querySelector('input[name$="_customerType"]').value.trim() || '',
+                    type: type,
+                    location: card.querySelector('input[name$="_location"]').value || '',
+                    region: card.querySelector('.job-region').textContent.replace('ภาค: ', ''),
+                    scores: Object.fromEntries(
+                        criteria.map(c => [c.id, parseInt(card.querySelector(`input[name$="_${c.id}"]`).value)])
+                    ),
+                    comments: card.querySelector('textarea[name$="_comments"]').value || ''
                 });
             }
+
+            const submitBtn = document.querySelector('#evaluationForm button[type="submit"]');
+            if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '⏳ กำลังส่ง...'; }
+
+            const payload = {
+                action: 'handleSubmission',
+                timestamp: new Date().toLocaleString('th-TH'),
+                phone: currentUser.phone,
+                name: currentUser.name,
+                truckNumber: document.getElementById('truckNumber').value,
+                installationDate: document.getElementById('installationDate').value,
+                jobs: jobs
+            };
+
+            fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                body: JSON.stringify(payload)
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (res.status === 'success' || res.success) {
+                    showMsg('formMsg', '✓ ส่งแบบฟอร์มสำเร็จ!', false);
+                    setTimeout(() => {
+                        document.getElementById('jobsContainer').innerHTML = '';
+                        document.getElementById('truckSelectionDiv').style.display = 'none';
+                        jobCount = 0;
+                        addJob();
+                    }, 2000);
+                } else {
+                    console.error('API Error:', res);
+                    showMsg('formMsg', '❌ ส่งไม่สำเร็จ: ' + (res.error || 'Unknown error'), true);
+                }
+            })
+            .catch(err => {
+                console.error('Fetch Error:', err);
+                showMsg('formMsg', '❌ เกิดข้อผิดพลาด', true);
+            })
+            .finally(() => {
+                if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '✅ ส่งประเมิน'; }
+            });
         }
 
         function showMsg(id, msg, isError) {
@@ -1211,84 +1239,102 @@
             );
 
             query.send(resp => {
-                if (resp.isError() || rowIndex >= resp.getDataTable().getNumberOfRows()) {
+                if (resp.isError()) {
                     alert('❌ ไม่พบข้อมูล');
                     return;
                 }
 
                 const data = resp.getDataTable();
-                const row = [];
-                for (let i = 0; i < data.getNumberOfColumns(); i++) {
-                    row.push(data.getValue(rowIndex, i));
+                if (rowIndex >= data.getNumberOfRows()) {
+                    alert('❌ ไม่พบข้อมูล');
+                    return;
                 }
 
-                renderModal(row);
+                const cols = data.getNumberOfColumns();
+                const getRow = (r) => {
+                    const a = [];
+                    for (let c = 0; c < cols; c++) a.push(data.getValue(r, c));
+                    return a;
+                };
+
+                const base = getRow(rowIndex);
+                const keyTs = String(base[0]);
+                const keyPhone = String(base[1]);
+
+                const jobs = [];
+                for (let r = 0; r < data.getNumberOfRows(); r++) {
+                    if (String(data.getValue(r, 0)) === keyTs && String(data.getValue(r, 1)) === keyPhone) {
+                        jobs.push(getRow(r));
+                    }
+                }
+
+                renderModal(jobs.length ? jobs : [base]);
                 document.getElementById('submissionModal').classList.add('active');
             });
         }
 
-        function renderModal(sub) {
-            const scores = {
-                accuracy: sub[10] || '-',
-                timeliness: sub[11] || '-',
-                professionalism: sub[12] || '-',
-                cleanliness: sub[13] || '-',
-                communication: sub[14] || '-'
-            };
+        function renderModal(jobs) {
+            const fmt2 = (n) => String(n).padStart(2, '0');
+            const first = jobs[0];
 
-            const scoreRows = Object.entries(scores).map(([k, v]) => {
-                const label = criteria.find(c => c.id === k)?.label || k;
-                return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${label}</span><strong>${v}/10</strong></div>`;
-            }).join('');
-
-            let submitDate = sub[0] || '-';
-            let installDate = sub[3] || '-';
-
+            let submitDate = first[0] || '-';
+            let installDate = first[3] || '-';
             if (submitDate instanceof Date) {
                 const d = submitDate;
-                submitDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()} ${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}:${String(d.getSeconds()).padStart(2, '0')}`;
+                submitDate = `${fmt2(d.getDate())}/${fmt2(d.getMonth() + 1)}/${d.getFullYear()} ${fmt2(d.getHours())}:${fmt2(d.getMinutes())}:${fmt2(d.getSeconds())}`;
             }
-
             if (installDate instanceof Date) {
                 const d = installDate;
-                installDate = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+                installDate = `${fmt2(d.getDate())}/${fmt2(d.getMonth() + 1)}/${d.getFullYear()}`;
             }
 
-            let phone = sub[1] || '-';
+            let phone = first[1] || '-';
             if (phone !== '-' && !String(phone).startsWith('0')) {
                 phone = '0' + phone;
             }
 
-            document.getElementById('modalBody').innerHTML = `
+            const header = `
                 <div style="margin-bottom:20px; font-size:13px; line-height:1.9;">
                     <div style="margin-bottom:6px;"><strong>วันที่ติดตั้ง:</strong> ${installDate}</div>
                     <div style="margin-bottom:6px;"><strong>วันที่ Submit:</strong> ${submitDate}</div>
-                    <div style="margin-bottom:6px;"><strong>ชื่อช่างติดตั้ง:</strong> ${sub[4] || '-'}</div>
+                    <div style="margin-bottom:6px;"><strong>ชื่อช่างติดตั้ง:</strong> ${first[4] || '-'}</div>
                     <div style="margin-bottom:6px;"><strong>เบอร์โทร:</strong> ${phone}</div>
-                    <div><strong>ใบรถ:</strong> ${sub[2] || '-'}</div>
-                </div>
+                    <div><strong>ใบรถ:</strong> ${first[2] || '-'}</div>
+                    <div style="margin-top:6px; color:#6b7280;">จำนวนงานในใบนี้: <strong>${jobs.length}</strong></div>
+                </div>`;
 
+            const jobSections = jobs.map((sub, idx) => {
+                const scores = {
+                    accuracy: sub[10] || '-',
+                    timeliness: sub[11] || '-',
+                    professionalism: sub[12] || '-',
+                    cleanliness: sub[13] || '-',
+                    communication: sub[14] || '-'
+                };
+                const scoreRows = Object.entries(scores).map(([k, v]) => {
+                    const label = criteria.find(c => c.id === k)?.label || k;
+                    return `<div style="display:flex; justify-content:space-between; padding:2px 0;"><span style="color:#6b7280;">${label}</span><strong>${v}/10</strong></div>`;
+                }).join('');
+
+                return `
                 <div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-bottom:20px;">
-                    <div style="font-weight:700; color:#667eea; margin-bottom:12px; font-size:13px;">ข้อมูลลูกค้า</div>
+                    <div style="font-weight:700; color:#667eea; margin-bottom:12px; font-size:13px;">งานที่ ${idx + 1}</div>
                     <div style="font-size:13px; line-height:1.9;">
                         <div style="margin-bottom:6px;"><strong>ชื่อลูกค้า:</strong> ${sub[5] || '-'}</div>
                         <div style="margin-bottom:6px;"><strong>ประเภทลูกค้า:</strong> ${sub[6] || '-'}</div>
                         <div style="margin-bottom:6px;"><strong>ประเภทงาน:</strong> ${sub[7] || '-'}</div>
                         <div style="margin-bottom:6px;"><strong>รหัสสาขา:</strong> ${sub[8] || '-'}</div>
-                        <div><strong>ภาค:</strong> ${sub[9] || '-'}</div>
+                        <div style="margin-bottom:6px;"><strong>ภาค:</strong> ${sub[9] || '-'}</div>
                     </div>
-                </div>
-
-                <div style="border-top:1px solid #e5e7eb; padding-top:16px;">
-                    <div style="font-weight:700; color:#667eea; margin-bottom:12px; font-size:13px;">การประเมิน</div>
-                    <div style="font-size:13px; line-height:2;">
+                    <div style="margin-top:12px; font-size:13px; line-height:2;">
                         ${scoreRows}
                     </div>
                     <div style="display:flex; justify-content:space-between; padding-top:12px; margin-top:12px; border-top:1px dashed #e5e7eb; font-weight:700; font-size:13px;"><span>เฉลี่ย</span><strong>${sub[16] || '-'}/10</strong></div>
-                </div>
+                    ${sub[15] ? `<div style="padding-top:12px; margin-top:12px; font-size:13px;"><strong>💬 ความเห็น:</strong> ${sub[15]}</div>` : ''}
+                </div>`;
+            }).join('');
 
-                ${sub[15] ? `<div style="border-top:1px solid #e5e7eb; padding-top:16px; margin-top:16px; font-size:13px;"><strong>💬 ความเห็น:</strong> ${sub[15]}</div>` : ''}
-            `;
+            document.getElementById('modalBody').innerHTML = header + jobSections;
         }
 
         function closeModal() {
@@ -1351,7 +1397,6 @@
 
         // ======================== DASHBOARD FUNCTIONS ========================
         function loadDashboard() {
-            google.charts.load('current', {'packages':['corechart']});
             google.charts.setOnLoadCallback(function() {
                 const query = new google.visualization.Query(
                     `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?headers=1&gid=0`
@@ -1374,30 +1419,36 @@
             let totalScore = 0;
             let totalJobs = rows;
 
+            const submissionSet = {};
+            const truckSet = {};
             for (let i = 0; i < rows; i++) {
                 const region = data.getValue(i, 9) || 'Unknown';
-                const avgScore = parseFloat(data.getValue(i, 16)) || 0;
+                const rowScore = parseFloat(data.getValue(i, 16)) || 0;
+                const ts = data.getValue(i, 0);
+                const ph = data.getValue(i, 1);
+                const truck = data.getValue(i, 2);
 
                 if (!regionScores[region]) {
                     regionScores[region] = [];
                 }
-                regionScores[region].push(avgScore);
-                totalScore += avgScore;
+                regionScores[region].push(rowScore);
+                totalScore += rowScore;
+                submissionSet[String(ts) + '|' + String(ph)] = true;
+                if (truck) truckSet[String(truck)] = true;
             }
 
-            // Calculate stats
-            const avgScore = (totalScore / rows).toFixed(1);
-            const completedCount = Math.floor(rows * 0.75); // 75% as mock
-            const remainingCount = rows - completedCount;
-            const completedPercent = Math.round((completedCount / rows) * 100);
-            const remainingPercent = 100 - completedPercent;
+            // Real metrics (no mock data)
+            const avgScore = rows > 0 ? (totalScore / rows).toFixed(1) : '0';
+            const submissionCount = Object.keys(submissionSet).length;
+            const truckCount = Object.keys(truckSet).length;
+            const jobsPerSubmission = submissionCount > 0 ? (rows / submissionCount).toFixed(1) : '0';
 
             // Update stat cards
             document.getElementById('stat_totalJobs').textContent = rows.toLocaleString();
-            document.getElementById('stat_completed').textContent = completedCount.toLocaleString();
-            document.getElementById('stat_completedPercent').textContent = completedPercent + '% done';
-            document.getElementById('stat_remaining').textContent = remainingCount.toLocaleString();
-            document.getElementById('stat_remainingPercent').textContent = remainingPercent + '% pending';
+            document.getElementById('stat_completed').textContent = submissionCount.toLocaleString();
+            document.getElementById('stat_completedPercent').textContent = jobsPerSubmission + ' งาน/ครั้ง';
+            document.getElementById('stat_remaining').textContent = truckCount.toLocaleString();
+            document.getElementById('stat_remainingPercent').textContent = 'คันที่ประเมิน';
 
             // Update quick stats
             document.getElementById('quick_totalJobs').textContent = rows;
@@ -1473,7 +1524,7 @@
                 legend: { position: 'bottom' },
                 colors: ['#3b82f6'],
                 hAxis: { textStyle: { fontSize: 12 } },
-                vAxis: { minValue: 7, maxValue: 10 },
+                vAxis: { minValue: 0, maxValue: 10 },
                 chartArea: {width: '90%', height: '80%'}
             };
             const lineChart = new google.visualization.LineChart(document.getElementById('chart_line'));
