@@ -473,6 +473,33 @@
             cursor: pointer;
             color: #6b7280;
         }
+    /* ============ TOAST ============ */
+        #toastContainer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 2000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            min-width: 220px;
+            max-width: 340px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.25s, transform 0.25s;
+        }
+        .toast.show { opacity: 1; transform: translateX(0); }
+        .toast.success { background: #10b981; }
+        .toast.error { background: #ef4444; }
+        .toast.info { background: #3b82f6; }
     </style>
 </head>
 <body>
@@ -844,7 +871,7 @@
         function lookupTruck() {
             const truck = document.getElementById('truckNumber').value.trim();
             if (!truck) {
-                alert('กรุณากรอกเลขที่ใบรถ');
+                showToast('กรุณากรอกเลขที่ใบรถ', 'error');
                 return;
             }
 
@@ -855,13 +882,14 @@
 
             query.send(resp => {
                 if (resp.isError()) {
-                    alert('❌ ไม่พบใบรถนี้');
+                    showToast('❌ ไม่พบใบรถนี้', 'error');
                     return;
                 }
 
                 const data = resp.getDataTable();
-                if (data.getNumberOfRows() === 0) {
-                    alert('❌ ไม่พบใบรถนี้');
+                const numRows = data.getNumberOfRows();
+                if (numRows === 0) {
+                    showToast('❌ ไม่พบใบรถนี้', 'error');
                     return;
                 }
 
@@ -869,7 +897,9 @@
                 document.getElementById('jobsContainer').innerHTML = '';
                 jobCount = 0;
 
-                if (data.getNumberOfRows() === 1) {
+                showToast(`✅ พบ ${numRows} งาน`, 'success');
+
+                if (numRows === 1) {
                     // Single job - load directly
                     selectedJobIndex = 0;
                     loadTruckDataFromRow(data, 0);
@@ -880,9 +910,9 @@
                     const dropdown = document.getElementById('truckSelectionDropdown');
                     dropdown.innerHTML = '<option value="">-- เลือกงาน --</option>';
 
-                    for (let i = 0; i < data.getNumberOfRows(); i++) {
+                    for (let i = 0; i < numRows; i++) {
                         const jobOrder = (i + 1); // Use row index as order number
-                        const customer = data.getValue(i, 13) || 'ไม่ระบุ';
+                        const customer = data.getValue(i, 17) || 'ไม่ระบุ'; // Column R
                         const option = document.createElement('option');
                         option.value = i;
                         option.textContent = `งาน ${jobOrder} : ${customer}`;
@@ -909,10 +939,11 @@
         }
 
         function loadTruckDataFromRow(data, rowIndex) {
-            const region = data.getValue(rowIndex, 19) || '-'; // Column T
+            const region = data.getValue(rowIndex, 23) || '-'; // Column X
             const jobType = data.getValue(rowIndex, 10) || 'เลือกประเภทงาน'; // Column K
-            const branchCode = data.getValue(rowIndex, 11) || ''; // Column L
-            const customer = data.getValue(rowIndex, 13) || ''; // Column N
+            const branchCode = data.getValue(rowIndex, 15) || ''; // Column P
+            const customer = data.getValue(rowIndex, 17) || ''; // Column R
+            const customerType = data.getValue(rowIndex, 16) || ''; // Column Q
             const installDate = data.getValue(rowIndex, 2) || ''; // Column C
             const jobOrder = data.getValue(rowIndex, 1) || ''; // Column B
 
@@ -965,6 +996,7 @@
             const card = addJob();
             if (card) {
                 card.querySelector(`[name="job${jobCount}_customer"]`).value = customer;
+                card.querySelector(`[name="job${jobCount}_customerType"]`).value = customerType;
                 card.querySelector(`[name="job${jobCount}_type"]`).value = jobType;
                 card.querySelector(`[name="job${jobCount}_location"]`).value = branchCode;
                 // Region shown in job header, not stored in input
@@ -1147,6 +1179,24 @@
             const el = document.getElementById(id);
             el.textContent = msg;
             el.className = 'message show ' + (isError ? 'error' : 'success');
+        }
+
+        function showToast(message, type) {
+            let container = document.getElementById('toastContainer');
+            if (!container) {
+                container = document.createElement('div');
+                container.id = 'toastContainer';
+                document.body.appendChild(container);
+            }
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + (type || 'info');
+            toast.textContent = message;
+            container.appendChild(toast);
+            requestAnimationFrame(() => toast.classList.add('show'));
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
         }
 
         // ======================== ADMIN FUNCTIONS ========================
